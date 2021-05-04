@@ -1,10 +1,6 @@
 #!/bin/bash
 
 
-### settings ###
-ubuntu_version="20.04"
-
-
 ### process opts ###
 if [[ -n "$1" ]]; then
     while [[ -n "$1" ]]; do
@@ -479,7 +475,7 @@ $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev
 
     # install dotnet
     mkdir -p $HOME/source/dotnet
-    wget "https://packages.microsoft.com/config/ubuntu/$ubuntu_version/packages-microsoft-prod.deb" -O /tmp/packages-microsoft-prod.deb
+    wget "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb" -O /tmp/packages-microsoft-prod.deb
     sudo dpkg -i /tmp/packages-microsoft-prod.deb
     sudo apt-get update
     sudo apt-get install -y dotnet-sdk-5.0 nuget
