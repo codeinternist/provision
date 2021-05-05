@@ -233,10 +233,14 @@ Categories=$2;
 setup_scroll_area
 
 ### update apt ###
-sudo apt-get update
+# sudo apt-get update
+echo "change me"
+sleep 0.4
 draw_progress_bar 2
 
-sudo apt-get -y upgrade
+# sudo apt-get -y upgrade
+echo "change me"
+sleep 0.4
 draw_progress_bar 4
 
 
@@ -245,7 +249,7 @@ draw_progress_bar 4
 ######################
 
 if [[ -n "$settings" ]]; then
-    echo "\n=== Applying Settings ===\n"
+    echo -e "\n====== Applying Settings ======\n"
 
     # add bash helpers
     echo -e " \
@@ -255,15 +259,15 @@ if [[ -n "$settings" ]]; then
 alias ..=\"cd ..\"\n \
 alias lsa=\"ls -al\"\n \
 alias psx=\"ps auxf\"\n \
-alias psu=\"ps -fjH -u $USER\"\n \
+alias psu=\"ps -fjH -u \$USER\"\n \
 \n \
 # bash functions\n \
-cdr() { cd $HOME/source/$1; }\n \
-context() { [[ -n $1 ]] && export $(grep -v '^#' $1 | xargs); }\n \
-detach() { [[ -n $1 ]] && $@ &>/dev/null & }\n \
-mkcd() { mkdir -p $1; cd $1; }\n \
+cdr() { cd \$HOME/source/\$1; }\n \
+context() { [[ -n \$1 ]] && export \$(grep -v '^#' \$1 | xargs); }\n \
+detach() { [[ -n \$1 ]] && \$@ &>/dev/null & }\n \
+mkcd() { mkdir -p \$1; cd \$1; }\n \
 rerc() { source ~/.bashrc; source ~/.bash_aliases; source ~/.bash_exports; }\n \
-weather() { zip=80204; [[ -n $1 ]] && zip=$1; curl https://wttr.in/$zip; }\n \
+weather() { zip=80204; [[ -n \$1 ]] && zip=\$1; curl https://wttr.in/\$zip; }\n \
 " >> $HOME/.bash_aliases
     draw_progress_bar 6
 
@@ -290,7 +294,7 @@ draw_progress_bar 12
 ###############################
 
 if [[ -n "$dev" ]]; then
-    echo "\n=== Installing Developer Tools ===\n"
+    echo -e "\n====== Installing Developer Tools ======\n"
 
     # setup
     mkdir -p $HOME/source
@@ -308,64 +312,64 @@ alias dnls=\"docker network ls\"\n \
 alias dps=\"docker ps -a\"\n \
 \n \
 # docker functions\n \
-dnuke() { docker kill $(docker ps -aq); docker rm $(docker ps -aq); docker rmi $(docker image ls -q); }\n \
-dup() { tag=$(tr -dc a-z0-9 </dev/urandom | head -c 10); docker build -t $tag .; docker run -e LOG_LEVEL=\"debug\" -p 50051:50051 $tag; }\n \
-dupe() { tag=$(tr -dc a-z0-9 </dev/urandom | head -c 10); docker build -t $tag .; docker run -e LOG_LEVEL=\"debug\" -e $(array_join \" -e \" \"$@\") -p 50051:50051 $tag; }\n \
-dxi() { [[ -n $1 ]] && docker exec -it $1 bash; }\n \
-logs() { [[ -n $1 ]] && { id=$(docker ps -a | grep \"$1\" | sed 's/ .*//'); [[ -n $id ]] && docker container logs $id; }; }\n \
+dnuke() { docker kill \$(docker ps -aq); docker rm \$(docker ps -aq); docker rmi \$(docker image ls -q); }\n \
+dup() { tag=\$(tr -dc a-z0-9 </dev/urandom | head -c 10); docker build -t \$tag .; docker run -e LOG_LEVEL=\"debug\" -p 50051:50051 \$tag; }\n \
+dupe() { tag=\$(tr -dc a-z0-9 </dev/urandom | head -c 10); docker build -t \$tag .; docker run -e LOG_LEVEL=\"debug\" -e \$(array_join \" -e \" \"\$@\") -p 50051:50051 \$tag; }\n \
+dxi() { [[ -n \$1 ]] && docker exec -it \$1 bash; }\n \
+logs() { [[ -n \$1 ]] && { id=\$(docker ps -a | grep \"\$1\" | sed 's/ .*//'); [[ -n \$id ]] && docker container logs \$id; }; }\n \
 \n \
 # git aliases\n \
-alias ga=\"$1\"\n \
-alias ga.=\"$1\"\n \
-alias gb=\"$1\"\n \
-alias gca=\"$1\"\n \
-alias gcd=\"$1\"\n \
-alias gd=\"$1\"\n \
-alias gdh=\"$1\"\n \
-alias gf=\"$1\"\n \
-alias gl=\"$1\"\n \
-alias gp=\"$1\"\n \
-alias gpsf=\"$1\"\n \
-alias gr=\"$1\"\n \
-alias grs=\"$1\"\n \
-alias grw=\"$1\"\n \
-alias gs=\"$1\"\n \
-alias gsa=\"$1\"\n \
-alias gsd=\"$1\"\n \
-alias gsl=\"$1\"\n \
-alias gsp=\"$1\"\n \
-alias gss=\"$1\"\n \
-alias gst=\"$1\"\n \
-alias tags=\"$1\"\n \
+alias ga=\"\$1\"\n \
+alias ga.=\"\$1\"\n \
+alias gb=\"\$1\"\n \
+alias gca=\"\$1\"\n \
+alias gcd=\"\$1\"\n \
+alias gd=\"\$1\"\n \
+alias gdh=\"\$1\"\n \
+alias gf=\"\$1\"\n \
+alias gl=\"\$1\"\n \
+alias gp=\"\$1\"\n \
+alias gpsf=\"\$1\"\n \
+alias gr=\"\$1\"\n \
+alias grs=\"\$1\"\n \
+alias grw=\"\$1\"\n \
+alias gs=\"\$1\"\n \
+alias gsa=\"\$1\"\n \
+alias gsd=\"\$1\"\n \
+alias gsl=\"\$1\"\n \
+alias gsp=\"\$1\"\n \
+alias gss=\"\$1\"\n \
+alias gst=\"\$1\"\n \
+alias tags=\"\$1\"\n \
 \n \
 # git functions\n \
-gcm() { [[ -n \"$1\" ]] && { msg=\"$@\"; git commit -m \"$(git_branch): $msg\"; }; }\n \
+gcm() { [[ -n \"\$1\" ]] && { msg=\"\$@\"; git commit -m \"\$(git_branch): \$msg\"; }; }\n \
 generic() { git checkout -b generic; git push --set-upstream origin generic; git checkout -; git branch -d generic; }\n \
 git_branch() { git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'; }\n \
-gpcm() { [[ -n \"$1\" ]] && { msg=\"$(git_branch): $@\"; black .; ga.; git commit -m \"$msg\"; gps; }; }\n \
+gpcm() { [[ -n \"\$1\" ]] && { msg=\"\$(git_branch): \$@\"; black .; ga.; git commit -m \"\$msg\"; gps; }; }\n \
 gps() {\n \
     git push\n \
-    branch=$(git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
-    if [[ \"$branch\" == \"main\" ]] || [[ \"$branch\" == \"master\" ]]; then\n \
+    branch=\$(git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
+    if [[ \"\$branch\" == \"main\" ]] || [[ \"\$branch\" == \"master\" ]]; then\n \
         git checkout -b generic\n \
         git push --set-upstream origin generic\n \
-        git checkout $branch\n \
+        git checkout \$branch\n \
         git branch -d generic\n \
     fi\n \
 }\n \
-gpsu() { git push --set-upstream origin $(git_branch); }\n \
+gpsu() { git push --set-upstream origin \$(git_branch); }\n \
 tag() {\n \
-    if [[ -n \"$1\" ]]; then\n \
-        dd=$(date +\"%Y.%m.%d\")\n \
-        ver=\"v/$dd\"\n \
-        msg=\"$@\"\n \
-        ct=$(git tag -l | grep \"$ver\" | wc -l)\n \
-        [[ \"$ct\" -ne \"0\" ]] && ver=\"$ver-$ct\"\n \
-        git tag -a \"$ver\" -m \"$msg\"\n \
-        git push origin \"$ver\"\n \
+    if [[ -n \"\$1\" ]]; then\n \
+        dd=\$(date +\"%Y.%m.%d\")\n \
+        ver=\"v/\$dd\"\n \
+        msg=\"\$@\"\n \
+        ct=\$(git tag -l | grep \"\$ver\" | wc -l)\n \
+        [[ \"\$ct\" -ne \"0\" ]] && ver=\"\$ver-\$ct\"\n \
+        git tag -a \"\$ver\" -m \"\$msg\"\n \
+        git push origin \"\$ver\"\n \
     fi\n \
 }\n \
-wip() { msg=\"$(git_branch): [WIP]\"; [[ -n $1 ]] && msg=\"$msg  $@\"; git commit -m \"$msg\"; }\n \
+wip() { msg=\"\$(git_branch): [WIP]\"; [[ -n \$1 ]] && msg=\"\$msg  \$@\"; git commit -m \"\$msg\"; }\n \
 \n \
 # google cloud aliases\n \
 alias g=\"gcloud\"\n \
@@ -390,11 +394,11 @@ alias kx=\"kubectl exec\"\n \
 complete -F __start_kubectl k\n \
 \n \
 # kubectl functions\n \
-kcns() { ns=$GENERIC_NAMESPACE; [[ -n \"$1\" ]] && ns=$1; kubectl config set-context $(kubectl config current-context) --namespace=$ns; }\n \
-kgp() { msg=\"\"; [[ -n \"$1\" ]] && msg=\" --field-selector=spec.nodeName=[$1]\"; kubectl get pods$msg; }\n \
-kgpw() { msg=\"\"; [[ -n \"$1\" ]] && msg=\" --field-selector=spec.nodeName=[$1]\"; kubectl get pods$msg -o wide; }\n \
-kxec() { [[ -n \"$2\" ]] && kubectl exec $1 -- $@; }\n \
-kxit() { cmd=/bin/sh; [[ -n \"$2\" ]] && cmd=\"$@\"; [[ -n \"$1\" ]] && kubectl exec -it $1 -- $cmd; }
+kcns() { ns=\$GENERIC_NAMESPACE; [[ -n \"\$1\" ]] && ns=\$1; kubectl config set-context \$(kubectl config current-context) --namespace=\$ns; }\n \
+kgp() { msg=\"\"; [[ -n \"\$1\" ]] && msg=\" --field-selector=spec.nodeName=[\$1]\"; kubectl get pods\$msg; }\n \
+kgpw() { msg=\"\"; [[ -n \"\$1\" ]] && msg=\" --field-selector=spec.nodeName=[\$1]\"; kubectl get pods\$msg -o wide; }\n \
+kxec() { [[ -n \"\$2\" ]] && kubectl exec \$1 -- \$@; }\n \
+kxit() { cmd=/bin/sh; [[ -n \"\$2\" ]] && cmd=\"\$@\"; [[ -n \"\$1\" ]] && kubectl exec -it \$1 -- \$cmd; }
 \n \
 # python functions\n \
 dvenv() { deactivate; rm -rf venv; }\n \
@@ -459,7 +463,7 @@ alias tfs=\"terraform show\"\n \
     # install docker
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+\$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io
     sudo groupadd docker
@@ -468,14 +472,14 @@ $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev
     draw_progress_bar 24
     
     # install docker-compose
-    sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-\$(uname -s)-\$(uname -m)" -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
     sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
     draw_progress_bar 26
 
     # install dotnet
     mkdir -p $HOME/source/dotnet
-    wget "https://packages.microsoft.com/config/ubuntu/$(lsb_release -rs)/packages-microsoft-prod.deb" -O /tmp/packages-microsoft-prod.deb
+    wget "https://packages.microsoft.com/config/ubuntu/\$(lsb_release -rs)/packages-microsoft-prod.deb" -O /tmp/packages-microsoft-prod.deb
     sudo dpkg -i /tmp/packages-microsoft-prod.deb
     sudo apt-get update
     sudo apt-get install -y dotnet-sdk-5.0 nuget
@@ -508,9 +512,9 @@ $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev
     export GOBIN=$HOME/go/bin
     export PATH=$PATH:/usr/local/go/bin:$GOBIN
     echo -e " \
-export GOPATH=$HOME/go\n \
-export GOBIN=$HOME/go/bin\n \
-export PATH=$PATH:/usr/local/go/bin:$GOBIN\n \
+export GOPATH=\$HOME/go\n \
+export GOBIN=\$HOME/go/bin\n \
+export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n \
 " >> $HOME/.bash_exports
     code --install-extension golang.go
     draw_progress_bar 36
@@ -542,9 +546,9 @@ export PATH=$PATH:/usr/local/go/bin:$GOBIN\n \
     mkdir -p $HOME/source/nodejs
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
     VERSION=node_8.x
-    DISTRO="$(lsb_release -s -c)"
-    echo "deb https://deb.nodesource.com/$VERSION $DISTRO main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-    echo "deb-src https://deb.nodesource.com/$VERSION $DISTRO main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
+    DISTRO="\$(lsb_release -s -c)"
+    echo "deb https://deb.nodesource.com/\$VERSION \$DISTRO main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+    echo "deb-src https://deb.nodesource.com/\$VERSION \$DISTRO main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
     sudo apt-get update
     sudo apt-get install -y nodejs npm
     echo -e "\n \
@@ -590,7 +594,7 @@ Categories=Development;
 
     # install terraform
     curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-    sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+    sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com \$(lsb_release -cs) main"
     sudo apt-get update
     sudo apt-get install -y terraform
     draw_progress_bar 56
@@ -611,7 +615,7 @@ draw_progress_bar 60
 ##########################
 
 if [[ -n "$basic" ]]; then
-    echo "\n=== Installing General Apps ===\n"
+    echo -e "\n====== Installing General Apps ======\n"
 
     # install draw.io (github.com/jgraph/drawio-desktop)
     wget "https://github.com/jgraph/drawio-desktop/releases/download/v14.5.1/drawio-amd64-14.5.1.deb" -O /tmp/drawio.deb
@@ -682,16 +686,16 @@ if [[ -n "$basic" ]]; then
 
     # install xpad
     sudo apt-get install -y xpad
-    draw_progress_bar 76
 fi
+draw_progress_bar 76
 
 
 ###########################
 ### install gaming apps ###
 ###########################
 
-if [[ -n "$game" ]] || [[ -n "$game_icons"]]; then
-    echo "\n=== Installing Gaming Apps ===\n"
+if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
+    echo -e "\n====== Installing Gaming Apps ======\n"
 
     # setup
     sudo dpkg --add-architecture i386
@@ -765,8 +769,8 @@ draw_progress_bar 96
 ### install gaming desktop icons ###
 ####################################
 
-if [[ -n "$game_icons"]]; then
-    echo "\n=== Installing Gaming Icons ===\n"
+if [[ -n "$game_icons" ]]; then
+    echo -e "\n====== Installing Gaming Icons ======\n"
     # discord       Discord
     # TODO  download/store image
     # TODO  create desktop icon
@@ -802,8 +806,8 @@ draw_progress_bar 98
 ### install media desktop icons ###
 ###################################
 
-if [[ -n "$media_icons"]]; then
-    echo "\n=== Installing Media Icons ===\n"
+if [[ -n "$media_icons" ]]; then
+    echo -e "\n====== Installing Media Icons ======\n"
     # Amazon
     # TODO  download/store image
     # TODO  create desktop icon
