@@ -836,7 +836,7 @@ alias tfs=\"terraform show\"\n \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
     unzip /tmp/awscliv2.zip
     sudo /tmp/aws/install
-    # TODO  initialize
+    # TODO  initialize aws-cli
     draw_progress_bar 22
 
     # install docker
@@ -873,12 +873,12 @@ alias tfs=\"terraform show\"\n \
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
     sudo apt-get update && sudo apt-get install -y google-cloud-sdk
-    # TODO  initialize
+    # TODO  initialize gcloud
     draw_progress_bar 32
 
     # install git
     sudo apt-get install -y git
-    # TODO  initialize
+    # TODO  initialize git
     draw_progress_bar 34
 
     # install golang
@@ -904,7 +904,7 @@ export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n \
     echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
     sudo apt-get update
     sudo apt-get install -y helm
-    # TODO  initialize
+    # TODO  initialize helm
     draw_progress_bar 38
 
     # install jq
@@ -913,7 +913,7 @@ export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n \
 
     # install kubectl
     gcloud components install kubectl
-    # TODO  initialize
+    # TODO  initialize kubectl
     draw_progress_bar 42
 
     # install latex
@@ -968,7 +968,7 @@ Categories=Development;
 
     # install slack
     sudo apt-get install -y slack-desktop
-    # TODO  configuration
+    # TODO  configure slack
     draw_progress_bar 54
 
     # install terraform
@@ -1017,6 +1017,37 @@ if [[ -n "$basic" ]]; then
     #   install darkreader extension
     wget "https://addons.mozilla.org/firefox/downloads/file/3763728/dark_reader-4.9.32-an+fx.xpi" -O /tmp/dark_reader-4.9.32-an+fx.xpi
     firefox /tmp/dark_reader-4.9.32-an+fx.xpi
+    #   install multi-container extension
+    wget "https://addons.mozilla.org/firefox/downloads/file/3713375/firefox_multi_account_containers-7.3.0-fx.xpi" -O /tmp/firefox_multi_account_containers-7.3.0-fx-xpi
+    firefox /tmp/firefox_multi_account_containers-7.3.0-fx.xpi
+    #   configure firefox
+    ff_prefs="/etc/firefox/prefs/all-users.js"
+    touch $ff_prefs
+    echo "pref('app.normandy.enabled', false);" >> $ff_prefs
+    echo "pref('browser.search.region', 'US');" >> $ff_prefs
+    echo "pref('browser.startup.homepage', 'about:blank');" >> $ff_prefs
+    echo "pref('browser.urlbar.placeholderName', 'DuckDuckGo');" >> $ff_prefs
+    echo "pref('browser.urlbar.placeholderName.private', 'DuckDuckGo');" >> $ff_prefs
+    echo "pref('browser.newtabpage.activity-stream.feeds.section.highlights', false);" >> $ff_prefs
+    echo "pref('browser.newtabpage.activity-stream.feeds.section.topstories', false);" >> $ff_prefs
+    echo "pref('browser.newtabpage.activity-stream.showSearch', false);" >> $ff_prefs
+    echo "pref('browser.newtabpage.activity-stream.showSponsored', false);" >> $ff_prefs
+    echo "pref('browser.newtabpage.activity-stream.showSponsoredTopSites', false);" >> $ff_prefs
+    echo "pref('browser.newtabpage.activity-stream.topSitesRows', 4);" >> $ff_prefs
+    echo "pref('browser.urlbar.trimURLs', false);" >> $ff_prefs
+    echo "pref('extensions.activeThemeID', 'firefox-compact-dark@mozilla.org');" >> $ff_prefs
+    echo "pref('general.smoothScroll', false);" >> $ff_prefs
+    echo "pref('general.smoothScroll.mouseWheel.migrationPercent', 0);" >> $ff_prefs
+    echo "pref('media.autoplay.default', 5);" >> $ff_prefs
+    echo "pref('network.dns.disablePrefetch', true);" >> $ff_prefs
+    echo "pref('network.http.speculative-parallel-limit', 0);" >> $ff_prefs
+    echo "pref('network.predictor.cleaned-up', true);" >> $ff_prefs
+    echo "pref('network.predictor.enabled', false);" >> $ff_prefs
+    echo "pref('network.prefetch-next', false);" >> $ff_prefs
+    echo "pref('permissions.default.camera', 2);" >> $ff_prefs
+    echo "pref('permissions.default.desktop-notification', 2);" >> $ff_prefs
+    echo "pref('permissions.default.geo', 2);" >> $ff_prefs
+    echo "pref('privacy.popups.policy', 1);" >> $ff_prefs
     draw_progress_bar 66
 
     # install google chrome
@@ -1048,6 +1079,7 @@ if [[ -n "$basic" ]]; then
     \"external_update_url\": \"https://clients2.google.com/service/update2/crx\"\n \
 }\n \
 " > /opt/google/chrome/extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm.json
+    # TODO  configure chrome
     draw_progress_bar 68
 
     # install google earth
@@ -1058,6 +1090,11 @@ if [[ -n "$basic" ]]; then
     wget "https://prerelease.keybase.io/keybase_amd64.deb" -O /tmp/keybase_amd64.deb
     sudo gdebi /tmp/keybase_amd64.deb
     draw_progress_bar 72
+
+    # install mullvad
+    wget --content-disposition https://mullvad.net/download/app/deb/latest -O /tmp/mullvad.deb
+    sudo gdebi /tmp/mullvad.deb
+    draw_progress_bar 73
 
     # install vlc
     sudo apt-get install -y vlc
@@ -1078,7 +1115,7 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
 
     # setup
     sudo dpkg --add-architecture i386
-    # TODO  controller drivers
+    # TODO  install controller drivers
 
     # install discord
     wget "https://dl.discordapp.net/discord-0.0.14.deb" -O /tmp/discord.deb
@@ -1089,31 +1126,31 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     sudo apt-add-repository ppa:dolphin-emu/ppa
     sudo apt update
     sudo apt install -y dolphin-emu
-    # TODO  configure
+    # TODO  configure dolphin
     draw_progress_bar 80
 
     # install fusion
     sudo apt-get update
     wget "https://www.carpeludum.com/download/kega-fusion_3.63-2_i386.deb" -O /tmp/kega-fusion.deb
     sudo gdebi /tmp/kega-fusion.deb
-    # TODO  configure
+    # TODO  configure fusion
     draw_progress_bar 82
 
     # install mupen64plus
     sudo apt-get install -y mupen64plus-qt
-    # TODO  configure
+    # TODO  configure mupen
     draw_progress_bar 84
 
     # install nestopia
     sudo apt-get install -y nestopia
-    # TODO  configure
+    # TODO  configure nestopia
     draw_progress_bar 86
 
     # install pcsx-reloaded
     sudo apt-get install pcsxr
     wget "https://the-eye.eu/public/rom/Bios/psx/scph1001.zip" -O /tmp/scph1001.zip
-    # TODO  load bios
-    # TODO  configure
+    # TODO  download psx bios
+    # TODO  configure pcsx
     draw_progress_bar 88
 
     # install pcsx2
@@ -1121,23 +1158,23 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     sudo apt update
     sudo apt install -y pcsx2
     wget "https://the-eye.eu/public/rom/Bios/ps2/sony_ps2_%28SCPH39001%29.rar" -O /tmp/scph39001.rar
-    # TODO  load bios
-    # TODO  configure
+    # TODO  download ps2 bios
+    # TODO  configure pcsx2
     draw_progress_bar 90
 
     # install redream
     wget "https://redream.io/redream.x86_64-linux-v1.5.0.tar.gz" -O /tmp/redream.tar.gz
     sudo mkdir -p /opt/redream
     sudo tar -C /opt/redream -xzf /tmp/redream.tar.gz
-    # TODO  download/store image
+    # TODO  download/store dreamcast icon image
     # TODO  menu_icon Redream Game /opt/redream/redream <icon>
-    # TODO  configure
+    # TODO  configure redream
     draw_progress_bar 92
 
     # install snes9x
     wget "https://sites.google.com/site/bearoso/snes9x/snes9x_1.60-1_amd64.deb" -O /tmp/snes9x.deb
     sudo gdebi /tmp/snes9x.deb
-    # TODO  configure
+    # TODO  configure snes9x
     draw_progress_bar 94
 
     # install steam
