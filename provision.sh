@@ -836,7 +836,6 @@ alias tfs=\"terraform show\"\n \
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
     unzip /tmp/awscliv2.zip
     sudo /tmp/aws/install
-    # TODO  initialize aws-cli
     draw_progress_bar 22
 
     # install docker
@@ -873,12 +872,10 @@ alias tfs=\"terraform show\"\n \
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
     sudo apt-get update && sudo apt-get install -y google-cloud-sdk
-    # TODO  initialize gcloud
     draw_progress_bar 32
 
     # install git
     sudo apt-get install -y git
-    # TODO  initialize git
     draw_progress_bar 34
 
     # install golang
@@ -904,7 +901,6 @@ export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n \
     echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
     sudo apt-get update
     sudo apt-get install -y helm
-    # TODO  initialize helm
     draw_progress_bar 38
 
     # install jq
@@ -913,7 +909,6 @@ export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n \
 
     # install kubectl
     gcloud components install kubectl
-    # TODO  initialize kubectl
     draw_progress_bar 42
 
     # install latex
@@ -1067,8 +1062,6 @@ if [[ -n "$basic" ]]; then
     chrext aeblfdkhhhdcdjpifhhbdiojplfjncoa
     #   install ublock origin extension
     chrext cjpalhdlnbpafiamejdnhcphjbkeiagm
-    #   configure chrome
-    
     draw_progress_bar 68
 
     # install google earth
@@ -1134,7 +1127,8 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     # install pcsx-reloaded
     sudo apt-get install pcsxr
     wget "https://the-eye.eu/public/rom/Bios/psx/scph1001.zip" -O /tmp/scph1001.zip
-    # TODO  extract/install psx bios
+    mkdir -p /etc/ps_bios/psx
+    unzip /tmp/scph1001.zip -d /etc/ps_bios/psx
     draw_progress_bar 88
 
     # install pcsx2
@@ -1142,7 +1136,8 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     sudo apt update
     sudo apt install -y pcsx2
     wget "https://the-eye.eu/public/rom/Bios/ps2/sony_ps2_%28SCPH39001%29.rar" -O /tmp/scph39001.rar
-    # TODO  extract/install ps2 bios
+    mkdir -p /etc/ps_bios/ps2
+    unrar x /tmp/scph39001.rar /etc/ps_bios/ps2
     draw_progress_bar 90
 
     # install redream
