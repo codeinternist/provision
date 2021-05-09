@@ -949,7 +949,7 @@ Categories=Development;
 
     # install python
     mkdir -p $HOME/source/python
-    sudo add-apt-repository ppa:deadsnakes/ppa
+    sudo add-apt-repository -y ppa:deadsnakes/ppa
     sudo apt-get update
     sudo apt-get install -y python3.9
     python3.9 -m pip
@@ -967,7 +967,7 @@ Categories=Development;
 
     # install terraform
     curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-    sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com \$(lsb_release -cs) main"
+    sudo apt-add-repository -y "deb [arch=amd64] https://apt.releases.hashicorp.com \$(lsb_release -cs) main"
     sudo apt-get update
     sudo apt-get install -y terraform
     draw_progress_bar 56
@@ -1049,12 +1049,11 @@ if [[ -n "$basic" ]]; then
     sudo apt-get install -y google-chrome-stable
     draw_progress_bar 67
 
-    [[ ! command -v jq ]] && sudo apt-get install -y jq
     google-chrome-stable --load-extension
     chrext() { 
         sudo touch /opt/google/chrome/extensions/$1.json
         sudo chmod +r /opt/google/chrome/extensions/$1.json
-        sudo jq -n '{"external_update_url":"https://clients2.google.com/service/update2/crx"}' > $1.json
+        sudo echo -e '{"external_update_url":"https://clients2.google.com/service/update2/crx"}' > $1.json
     }
     #   install darkreader extension
     chrext eimadpbcbfnmbkopoojfekhnkhdbieeh
@@ -1105,7 +1104,7 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     draw_progress_bar 78
 
     # install dolphin
-    sudo apt-add-repository ppa:dolphin-emu/ppa
+    sudo apt-add-repository -y ppa:dolphin-emu/ppa
     sudo apt update
     sudo apt install -y dolphin-emu
     draw_progress_bar 80
@@ -1132,7 +1131,7 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     draw_progress_bar 88
 
     # install pcsx2
-    sudo add-apt-repository ppa:gregory-hainaut/pcsx2.official.ppa
+    sudo add-apt-repository -y ppa:gregory-hainaut/pcsx2.official.ppa
     sudo apt update
     sudo apt install -y pcsx2
     wget "https://the-eye.eu/public/rom/Bios/ps2/sony_ps2_%28SCPH39001%29.rar" -O /tmp/scph39001.rar
@@ -1161,7 +1160,7 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     # install wine
     wget -nc https://dl.winehq.org/wine-builds/winehq.key -O /tmp/winehq.key
     sudo apt-key add /tmp/winehq.key
-    sudo add-apt-repository "deb https://dl.winehq.org/wine-builds/ubuntu/ focal main"
+    sudo add-apt-repository -y "deb https://dl.winehq.org/wine-builds/ubuntu/ focal main"
     sudo apt-get update
     sudo apt-get install --install-recommends winehq-stable
 fi
