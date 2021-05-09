@@ -968,7 +968,6 @@ Categories=Development;
 
     # install slack
     sudo apt-get install -y slack-desktop
-    # TODO  configure slack
     draw_progress_bar 54
 
     # install terraform
@@ -1008,6 +1007,7 @@ if [[ -n "$basic" ]]; then
     # install firefox
     sudo apt-get install -y firefox
     draw_progress_bar 65
+
     #   install ublock origin extension
     wget "https://addons.mozilla.org/firefox/downloads/file/3763753/ublock_origin-1.35.0-an+fx.xpi" -O /tmp/ublock_origin-1.35.0-an+fx.xpi
     firefox /tmp/ublock_origin-1.35.0-an+fx.xpi
@@ -1054,32 +1054,21 @@ if [[ -n "$basic" ]]; then
     sudo apt-get install -y google-chrome-stable
     draw_progress_bar 67
 
+    [[ ! command -v jq ]] && sudo apt-get install -y jq
     google-chrome-stable --load-extension
+    chrext() { 
+        sudo touch /opt/google/chrome/extensions/$1.json
+        sudo chmod +r /opt/google/chrome/extensions/$1.json
+        sudo jq -n '{"external_update_url":"https://clients2.google.com/service/update2/crx"}' > $1.json
+    }
     #   install darkreader extension
-    sudo touch /opt/google/chrome/extensions/eimadpbcbfnmbkopoojfekhnkhdbieeh.json
-    sudo chmod +r /opt/google/chrome/extensions/eimadpbcbfnmbkopoojfekhnkhdbieeh.json
-    sudo echo -e " \
-{\n \
-    \"external_update_url\": \"https://clients2.google.com/service/update2/crx\"\n \
-}\n \
-" > /opt/google/chrome/extensions/eimadpbcbfnmbkopoojfekhnkhdbieeh.json
+    chrext eimadpbcbfnmbkopoojfekhnkhdbieeh
     #   install 1password extension
-    sudo touch /opt/google/chrome/extensions/aeblfdkhhhdcdjpifhhbdiojplfjncoa.json
-    sudo chmod +r /opt/google/chrome/extensions/aeblfdkhhhdcdjpifhhbdiojplfjncoa.json
-    sudo echo -e " \
-{\n \
-    \"external_update_url\": \"https://clients2.google.com/service/update2/crx\"\n \
-}\n \
-" > /opt/google/chrome/extensions/aeblfdkhhhdcdjpifhhbdiojplfjncoa.json
+    chrext aeblfdkhhhdcdjpifhhbdiojplfjncoa
     #   install ublock origin extension
-    sudo touch /opt/google/chrome/extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm.json
-    sudo chmod +r /opt/google/chrome/extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm.json
-    sudo echo -e " \
-{\n \
-    \"external_update_url\": \"https://clients2.google.com/service/update2/crx\"\n \
-}\n \
-" > /opt/google/chrome/extensions/cjpalhdlnbpafiamejdnhcphjbkeiagm.json
-    # TODO  configure chrome
+    chrext cjpalhdlnbpafiamejdnhcphjbkeiagm
+    #   configure chrome
+    
     draw_progress_bar 68
 
     # install google earth
@@ -1115,7 +1104,7 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
 
     # setup
     sudo dpkg --add-architecture i386
-    # TODO  install controller drivers
+    mkdir -p /etc/icons
 
     # install discord
     wget "https://dl.discordapp.net/discord-0.0.14.deb" -O /tmp/discord.deb
@@ -1126,31 +1115,26 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     sudo apt-add-repository ppa:dolphin-emu/ppa
     sudo apt update
     sudo apt install -y dolphin-emu
-    # TODO  configure dolphin
     draw_progress_bar 80
 
     # install fusion
     sudo apt-get update
     wget "https://www.carpeludum.com/download/kega-fusion_3.63-2_i386.deb" -O /tmp/kega-fusion.deb
     sudo gdebi /tmp/kega-fusion.deb
-    # TODO  configure fusion
     draw_progress_bar 82
 
     # install mupen64plus
     sudo apt-get install -y mupen64plus-qt
-    # TODO  configure mupen
     draw_progress_bar 84
 
     # install nestopia
     sudo apt-get install -y nestopia
-    # TODO  configure nestopia
     draw_progress_bar 86
 
     # install pcsx-reloaded
     sudo apt-get install pcsxr
     wget "https://the-eye.eu/public/rom/Bios/psx/scph1001.zip" -O /tmp/scph1001.zip
-    # TODO  download psx bios
-    # TODO  configure pcsx
+    # TODO  extract/install psx bios
     draw_progress_bar 88
 
     # install pcsx2
@@ -1158,30 +1142,35 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     sudo apt update
     sudo apt install -y pcsx2
     wget "https://the-eye.eu/public/rom/Bios/ps2/sony_ps2_%28SCPH39001%29.rar" -O /tmp/scph39001.rar
-    # TODO  download ps2 bios
-    # TODO  configure pcsx2
+    # TODO  extract/install ps2 bios
     draw_progress_bar 90
 
     # install redream
     wget "https://redream.io/redream.x86_64-linux-v1.5.0.tar.gz" -O /tmp/redream.tar.gz
     sudo mkdir -p /opt/redream
     sudo tar -C /opt/redream -xzf /tmp/redream.tar.gz
-    # TODO  download/store dreamcast icon image
-    # TODO  menu_icon Redream Game /opt/redream/redream <icon>
-    # TODO  configure redream
+    [[ -f /etc/icons/redream.jpg ]] || sudo wget "https://clipground.com/images/dreamcast-logo-png-3.jpg" -O /etc/icons/redream.jpg
+    menu_icon Redream Game /opt/redream/redream /etc/icons/dreamcast.jpg
     draw_progress_bar 92
 
     # install snes9x
     wget "https://sites.google.com/site/bearoso/snes9x/snes9x_1.60-1_amd64.deb" -O /tmp/snes9x.deb
     sudo gdebi /tmp/snes9x.deb
-    # TODO  configure snes9x
     draw_progress_bar 94
 
     # install steam
     wget "https://repo.steampowered.com/steam_latest.deb" -O /tmp/steam.deb
     sudo gdebi /tmp/steam.deb
+    draw_progress_bar 95
+
+    # install wine
+    wget -nc https://dl.winehq.org/wine-builds/winehq.key -O /tmp/winehq.key
+    sudo apt-key add /tmp/winehq.key
+    sudo add-apt-repository "deb https://dl.winehq.org/wine-builds/ubuntu/ focal main"
+    sudo apt-get update
+    sudo apt-get install --install-recommends winehq-stable
 fi
-draw_progress_bar 96
+draw_progress_bar 97
 
 
 ####################################
@@ -1190,33 +1179,49 @@ draw_progress_bar 96
 
 if [[ -n "$game_icons" ]]; then
     echo -e "\n====== Installing Gaming Icons ======\n"
-    # discord       Discord
-    # TODO  download/store image
-    # TODO  desktop_icon <name> <type> <path> <icon>
-    # dolphin-emu   GameCube + Wii
-    # TODO  download/store image
-    # TODO  desktop_icon <name> <type> <path> <icon>
-    # kega-fusion   Sega Genesis
-    # TODO  download/store image
-    # TODO  desktop_icon <name> <type> <path> <icon>
-    # mupen64plus   N64
-    # TODO  download/store image
-    # TODO  desktop_icon <name> <type> <path> <icon>
-    # nestopia      Nintendo
-    # TODO  download/store image
-    # TODO  desktop_icon <name> <type> <path> <icon>
-    # pcsx2         Playstation
-    # TODO  download/store image
-    # TODO  desktop_icon <name> <type> <path> <icon>
-    # redream       Dreamcast
-    # TODO  download/store image
-    # TODO  desktop_icon <name> <type> <path> <icon>
-    # snes9x        Super Nintendo
-    # TODO  download/store image
-    # TODO  desktop_icon <name> <type> <path> <icon>
-    # steam         Steam
-    # TODO  download/store image
-    # TODO  desktop_icon <name> <type> <path> <icon>
+
+    # setup
+    mkdir -p /etc/icons
+
+    # discord
+    sudo wget "https://cdn.imgbin.com/0/17/7/imgbin-discord-computer-servers-teamspeak-discord-icon-4pH3jH6t4ZEg9mnJxB8vNXbNB.jpg" -O /etc/icons/discord.jpg
+    desktop_icon discord Game `which discord` /etc/icons/discord.jpg
+    
+    # dolphin
+    sudo wget "https://www.logolynx.com/images/logolynx/da/da85020e7769ecd41a5e3e7d313d3e0b.png" -O /etc/icons/dolphin.png
+    desktop_icon dolphin-emu Game `which dolphin-emu` /etc/icons/dolphin.png
+
+    # fusion
+    sudo wget "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Sega_genesis_logo.svg/1280px-Sega_genesis_logo.svg.png" -O /etc/icons/fusion.png
+    desktop_icon kega-fusion Game `which kega-fusion` /etc/icons/fusion.png
+
+    # mupen
+    sudo wget "https://clipartart.com/images/n64-icon-clipart-3.jpg" -O /etc/icons/mupen.jpg
+    desktop_icon mupen64plus-qt Game `which mupen64plus-qt` /etc/icons/mupen.jpg
+
+    # nestopia
+    sudo wget "https://cdn2.iconfinder.com/data/icons/devices-79/512/Controller-512.png" -O /etc/icons/nestopia.png
+    desktop_icon nestopia Game `which nestopia` /etc/icons/nestopia.png
+    
+    # pcsx
+    sudo wget "https://image.flaticon.com/icons/png/512/588/588299.png" -O /etc/icons/pcsx.png
+    desktop_icon pcsx Game `which pcsx` /etc/icons/pcsx.png
+
+    # pcsx2
+    sudo wget "https://image.flaticon.com/icons/png/512/588/588284.png" -O /etc/icons/pcsx2.png
+    desktop_icon pcsx2 Game `which pcsx2` /etc/icons/pcsx2.png
+    
+    # redream
+    [[ -f /etc/icons/redream.jpg ]] || sudo wget "https://clipground.com/images/dreamcast-logo-png-3.jpg" -O /etc/icons/redream.jpg
+    desktop_icon Dreamcast Game /opt/redream/redream /etc/icons/redream.jpg
+
+    # snes9x
+    sudo wget "https://findicons.com/files/icons/1063/3d_cartoon_icons_iii/300/nintendo_snes.png" -O /etc/icons/snes9x.png
+    desktop_icon snes9x Game `which snes9x` /etc/icons/snes9x.png
+
+    # steam
+    sudo wget "https://cdn2.iconfinder.com/data/icons/zeshio-s-social-media/200/Social_Media_Icons_Edged_Highlight_16-16-512.png" -O /etc/icons/steam.png
+    desktop_icon steam Game `which steam` /etc/icons/steam.png
 fi
 draw_progress_bar 98
 
@@ -1227,39 +1232,53 @@ draw_progress_bar 98
 
 if [[ -n "$media_icons" ]]; then
     echo -e "\n====== Installing Media Icons ======\n"
-    # Amazon
-    # TODO  download/store image
-    # TODO  desktop_link Amazon AudioVideo <url> <icon>
+
+    # setup
+    mkdir -p /etc/icons
+    
+    # Amazon 
+    sudo wget "https://vectorified.com/images/amazon-prime-video-icon-10.jpg" -O /etc/icons/amazon.jpg
+    desktop_link Amazon AudioVideo "https://www.amazon.com/Amazon-Video" /etc/icons/amazon.jpg
+
     # Discovery+
-    # TODO  download/store image
-    # TODO  desktop_link Discovery+ AudioVideo <url> <icon>
+    sudo wget "https://banner2.kisspng.com/20180404/poe/kisspng-discovery-channel-logo-television-channel-discover-investigation-5ac4e8fb2f2be3.8742228415228541391932.jpg" -O /etc/icons/discovery.jpg
+    desktop_link Discovery+ AudioVideo "https://www.discoveryplus.com" /etc/icons/discovery.jpg
+
     # ESPN
-    # TODO  download/store image
-    # TODO  desktop_link ESPN AudioVideo <url> <icon>
+    sudo wget "http://logok.org/wp-content/uploads/2015/02/ESPN-logo-wordmark.png" -O /etc/icons/espn.png
+    desktop_link ESPN AudioVideo "https://www.espn.com/watch/" /etc/icons/espn.png
+
     # HBO Max
-    # TODO  download/store image
-    # TODO  desktop_link HBO Max AudioVideo <url> <icon>
+    sudo wget "http://logok.org/wp-content/uploads/2014/10/HBO_logo.png" -O /etc/icons/hbo.png
+    desktop_link HBO Max AudioVideo "https://play.hbomax.com/n" /etc/icons/hbo.png
+
     # Netflix
-    # TODO  download/store image
-    # TODO  desktop_link Netflix AudioVideo <url> <icon>
+    sudo wget "https://dwglogo.com/wp-content/uploads/2019/02/Netflix_N_logo.png" -O /etc/icons/netflix.png
+    desktop_link Netflix AudioVideo "https://www.netflix.com/browse" /etc/icons/netflix.png
+
     # Peacock
-    # TODO  download/store image
-    # TODO  desktop_link Peacock AudioVideo <url> <icon>
+    sudo wget "http://logok.org/wp-content/uploads/2014/03/NBC-peacock-logo.png" -O /etc/icons/peacock.png
+    desktop_link Peacock AudioVideo "https://www.peacocktv.com/watch/home" /etc/icons/peacock.png
+
     # SportSurge
-    # TODO  download/store image
-    # TODO  desktop_link --ff SportSurge AudioVideo <url> <icon>
+    sudo wget "http://img4.wikia.nocookie.net/__cb20120228000222/logopedia/images/6/64/Surge_logo1.jpg" -O /etc/icons/surge.jpg
+    desktop_link --ff SportSurge AudioVideo "https://sportsurge.net" /etc/icons/surge.jpg
+
     # Spotify
-    # TODO  download/store image
-    # TODO  desktop_link Spotify AudioVideo <url> <icon>
+    sudo wget "http://www.soft32.com/blog/wp-content/uploads/2016/08/spotify_logo.png" -O /etc/icons/spotify.png
+    desktop_link Spotify AudioVideo "https://open.spotify.com/" /etc/icons/spotify.png
+
     # VLC
-    # TODO  download/store image
-    # TODO  desktop_icon VLC AudioVideo <path> <icon>
+    sudo wget "https://clipground.com/images/vlc-media-player-clipart-1.jpg" -O /etc/icons/vlc.jpg
+    desktop_icon VLC AudioVideo `which vlc` /etc/icons/vlc.jpg
+
     # VoloKit
-    # TODO  download/store image
-    # TODO  desktop_link --ff VoloKit AudioVideo <url> <icon>
+    sudo wget "https://pngimg.com/uploads/vkontakte/vkontakte_PNG8.png" -O /etc/icons/volokit.png
+    desktop_link --ff VoloKit AudioVideo "http://www.volokit.com/" /etc/icons/volokit.png
+
     # YouTube
-    # TODO  download/store image
-    # TODO  desktop_link --ff YouTube AudioVideo <url> <icon>
+    sudo wget "https://dwglogo.com/wp-content/uploads/2020/05/1200px-YouTube_logo.png" -O /etc/icons/youtube.png
+    desktop_link --ff YouTube AudioVideo "https://www.youtube.com/" /etc/icons/youtube.png
 fi
 draw_progress_bar 100
 destroy_scroll_area
