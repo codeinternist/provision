@@ -313,7 +313,7 @@ weather() { zip=80204; [[ -n \$1 ]] && zip=\$1; curl https://wttr.in/\$zip; }\n 
     sudo apt-get install fonts-firacode
     draw_progress_bar 8
 
-    # add agnoster prompt
+    # add agnoster prompt   FIXME 220 syntax error unexpected token '||'
     echo -e " \
 # ~/.bashrc: executed by bash(1) for non-login shells.\n \
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)\n \
@@ -837,7 +837,7 @@ alias tfs=\"terraform show\"\n \
     code --install-extension tomoyukim.vscode-mermaid-editor
     draw_progress_bar 18
     
-    # install arduino (broken)
+    # install arduino
     mkdir -p $HOME/source/arduino
     wget https://downloads.arduino.cc/arduino-1.8.13-linux64.tar.xz -O /tmp/arduino.tar.xz
     mydir /etc/arduino
@@ -845,16 +845,16 @@ alias tfs=\"terraform show\"\n \
     /etc/arduino/install.sh
     draw_progress_bar 20
     
-    # install aws-cli (broken)
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O /tmp/awscliv2.zip
+    # install aws-cli
+    wget "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O /tmp/awscliv2.zip
     unzip /tmp/awscliv2.zip
     sudo /tmp/aws/install
     draw_progress_bar 22
 
-    # install docker (broken)
+    # install docker
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-\$RELEASE_NAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+$RELEASE_NAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io
     sudo groupadd docker
@@ -868,7 +868,7 @@ alias tfs=\"terraform show\"\n \
     sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
     draw_progress_bar 26
 
-    # install dotnet (broken)
+    # install dotnet    FIXME 404
     mkdir -p $HOME/source/dotnet
     wget "https://packages.microsoft.com/config/ubuntu/\$RELEASE_VERSION/packages-microsoft-prod.deb" -O /tmp/packages-microsoft-prod.deb
     sudo dpkg -i /tmp/packages-microsoft-prod.deb
@@ -881,7 +881,7 @@ alias tfs=\"terraform show\"\n \
     sudo apt-get install -y g++
     draw_progress_bar 30
 
-    # install gcloud (broken)
+    # install gcloud
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
     sudo apt-get update
@@ -936,7 +936,7 @@ export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n \
     mkdir -p $HOME/source/nodejs
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
     VERSION=node_8.x
-    DISTRO="\$RELEASE_NAME"
+    DISTRO="$RELEASE_NAME"
     echo "deb https://deb.nodesource.com/\$VERSION \$DISTRO main" | sudo tee /etc/apt/sources.list.d/nodesource.list
     echo "deb-src https://deb.nodesource.com/\$VERSION \$DISTRO main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
     sudo apt-get update
@@ -966,23 +966,23 @@ export NODE_OPTIONS=\"--experimental-repl-await\"\n \
     
     # install rpi-imager
     wget "https://downloads.raspberrypi.org/imager/imager_latest_amd64.deb" -O /tmp/rpi-imager.deb
-    sudo gdebi /tmp/rpi-imager.deb
+    sudo gdebi -n /tmp/rpi-imager.deb
     draw_progress_bar 52
 
     # install slack
     wget "https://downloads.slack-edge.com/slack-desktop-4.15.0-amd64.deb" -O /tmp/slack.deb
-    sudo gdebi /tmp/slack.deb
+    sudo gdebi -n /tmp/slack.deb
     draw_progress_bar 54
 
     # install terraform
     curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-    sudo apt-add-repository -y "deb [arch=amd64] https://apt.releases.hashicorp.com \$RELEASE_NAME main"
+    sudo apt-add-repository -y "deb [arch=amd64] https://apt.releases.hashicorp.com $RELEASE_NAME main"
     sudo apt-get update
     sudo apt-get install -y terraform
     draw_progress_bar 56
 
     # install tldr
-    npm i -g tldr
+    sudo apt-get install -y tldr
     draw_progress_bar 58
 
     # install yq
@@ -1001,7 +1001,7 @@ if [[ -n "$basic" ]]; then
 
     # install draw.io (github.com/jgraph/drawio-desktop)
     wget "https://github.com/jgraph/drawio-desktop/releases/download/v14.5.1/drawio-amd64-14.5.1.deb" -O /tmp/drawio.deb
-    sudo gdebi /tmp/drawio.deb
+    sudo gdebi -n /tmp/drawio.deb
     draw_progress_bar 62
 
     # install filezilla
@@ -1026,6 +1026,7 @@ if [[ -n "$basic" ]]; then
     firefox /tmp/firefox_multi_account_containers-7.3.0-fx.xpi
     #   configure firefox
     ff_prefs="/etc/firefox/prefs/all-users.js"
+    sudo mkdir -p /etc/firefox/prefs
     sudo touch $ff_prefs
     sudo chown `id -nu`:`id -ng` $ff_prefs
     echo "pref('app.normandy.enabled', false);" >> $ff_prefs
@@ -1055,7 +1056,7 @@ if [[ -n "$basic" ]]; then
     echo "pref('privacy.popups.policy', 1);" >> $ff_prefs
     draw_progress_bar 66
 
-    # install google chrome
+    # install google chrome FIXME cannot find package
     sudo apt-get install -y google-chrome-stable
     draw_progress_bar 67
 
@@ -1079,12 +1080,12 @@ if [[ -n "$basic" ]]; then
 
     # install keybase
     wget "https://prerelease.keybase.io/keybase_amd64.deb" -O /tmp/keybase_amd64.deb
-    sudo gdebi /tmp/keybase_amd64.deb
+    sudo gdebi -n /tmp/keybase_amd64.deb
     draw_progress_bar 72
 
     # install mullvad
     wget --content-disposition https://mullvad.net/download/app/deb/latest -O /tmp/mullvad.deb
-    sudo gdebi /tmp/mullvad.deb
+    sudo gdebi -n /tmp/mullvad.deb
     draw_progress_bar 73
 
     # install vlc
@@ -1109,9 +1110,9 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     sudo mkdir -p /etc/icons
     sudo chown `id -nu`:`id -ng` /etc/icons
 
-    # install discord
+    # install discord   FIXME .deb was text/html
     wget "https://dl.discordapp.net/discord-0.0.14.deb" -O /tmp/discord.deb
-    sudo gdebi /tmp/discord.deb
+    sudo gdebi -n /tmp/discord.deb
     draw_progress_bar 78
 
     # install dolphin
@@ -1122,7 +1123,7 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
 
     # install fusion
     wget "https://www.carpeludum.com/download/kega-fusion_3.63-2_i386.deb" -O /tmp/kega-fusion.deb
-    sudo gdebi /tmp/kega-fusion.deb
+    sudo gdebi -n /tmp/kega-fusion.deb
     draw_progress_bar 82
 
     # install mupen64plus
@@ -1151,7 +1152,7 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     unrar x /tmp/scph39001.rar /etc/ps_bios/ps2
     draw_progress_bar 90
 
-    # install redream
+    # install redream   FIXME tar.gz is actually text/html
     wget "https://redream.io/redream.x86_64-linux-v1.5.0.tar.gz" -O /tmp/redream.tar.gz
     sudo mkdir -p /opt/redream
     sudo tar -C /opt/redream -xzf /tmp/redream.tar.gz
@@ -1161,12 +1162,12 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
 
     # install snes9x
     wget "https://sites.google.com/site/bearoso/snes9x/snes9x_1.60-1_amd64.deb" -O /tmp/snes9x.deb
-    sudo gdebi /tmp/snes9x.deb
+    sudo gdebi -n /tmp/snes9x.deb
     draw_progress_bar 94
 
-    # install steam
+    # install steam     FIXME 404
     wget "https://repo.steampowered.com/steam_latest.deb" -O /tmp/steam.deb
-    sudo gdebi /tmp/steam.deb
+    sudo gdebi -n /tmp/steam.deb
     draw_progress_bar 95
 
     # install wine
