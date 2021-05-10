@@ -200,6 +200,7 @@ printf_new() {
 ### icon factories ###
 
 desktop_icon() {
+    # desktop_icon NAME TYPE PATH ICON
     file=$HOME/Desktop/$1.desktop
     touch $file
     echo -e " \
@@ -215,6 +216,7 @@ Categories=$2;
 }
 
 desktop_link() {
+    # menu_icon [--ff] NAME TYPE URL ICON
     if [[ "$1" == "--ff" ]]; then
         name="$2"
         type="$3"
@@ -242,6 +244,7 @@ Categories=$type;
 }
 
 menu_icon() {
+    # menu_icon NAME TYPE PATH ICON
     file=$HOME/.local/share/applications/$1.desktop
     touch $file
     echo -e " \
@@ -254,6 +257,13 @@ Terminal=false\n \
 Type=Application\n \
 Categories=$2;
 " > $file
+}
+
+mydir() {
+    id=`id -nu`
+    grp=`id -ng`
+    sudo mkdir -p $1
+    sudo chown $id:$grp $1
 }
 
 #####################################################
@@ -830,8 +840,7 @@ alias tfs=\"terraform show\"\n \
     # install arduino (broken)
     mkdir -p $HOME/source/arduino
     wget https://downloads.arduino.cc/arduino-1.8.13-linux64.tar.xz -O /tmp/arduino.tar.xz
-    sudo mkdir -p /etc/arduino
-    sudo chown `id -nu`:`id -ng` /etc/arduino
+    mydir /etc/arduino
     tar xzf /tmp/arduino.tar.xz -C /etc/arduino
     /etc/arduino/install.sh
     draw_progress_bar 20
@@ -880,6 +889,8 @@ alias tfs=\"terraform show\"\n \
     draw_progress_bar 32
 
     # install git
+    sudo add-apt-repository -y ppa:git-core/ppa
+    sudo apt-get update
     sudo apt-get install -y git
     draw_progress_bar 34
 
@@ -913,7 +924,7 @@ export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n \
     draw_progress_bar 40
 
     # install kubectl
-    gcloud components install kubectl
+    sudo apt-get install -y kubectl
     draw_progress_bar 42
 
     # install latex
@@ -936,20 +947,11 @@ export NODE_OPTIONS=\"--experimental-repl-await\"\n \
 " >> $HOME/.bash_exports
     draw_progress_bar 46
 
-    # install postman (need postman desktop not agent)
-    wget "https://dl-agent.pstmn.io/download/latest/linux" -O /tmp/postman.tar.gz
-    sudo tar -C /opt -xzf /tmp/postman.tar.gz
-    touch $HOME/.local/share/applications/Postman.desktop
-    echo -e " \
-[Desktop Entry]\n \
-Encoding=UTF-8\n \
-Name=Postman\n \
-Exec=/opt/Postman/app/Postman %U\n \
-Icon=/opt/Postman/app/resources/app/assets/icon.png\n \
-Terminal=false\n \
-Type=Application\n \
-Categories=Development;
-" > $HOME/.local/share/applications/Postman.desktop
+    # install postman
+    wget "https://dl.pstmn.io/download/latest/linux64" -O /tmp/postman.tar.gz
+    mydir /opt/postman
+    tar -C /opt/postman -xzf /tmp/postman.tar.gz
+    menu_icon Postman Development /opt/postman/Postman/app/Postman /opt/postman/Postman/app/resources/app/assets/icon.png
     draw_progress_bar 48
 
     # install python
@@ -962,15 +964,17 @@ Categories=Development;
     code --install-extension ms-python.python
     draw_progress_bar 50
     
-    # install rpi-imager (cannot find package)
-    sudo apt-get install -y rpi-imager
+    # install rpi-imager
+    wget "https://downloads.raspberrypi.org/imager/imager_latest_amd64.deb" -O /tmp/rpi-imager.deb
+    sudo gdebi /tmp/rpi-imager.deb
     draw_progress_bar 52
 
-    # install slack (cannot find package)
-    sudo apt-get install -y slack-desktop
+    # install slack
+    wget "https://downloads.slack-edge.com/slack-desktop-4.15.0-amd64.deb" -O /tmp/slack.deb
+    sudo gdebi /tmp/slack.deb
     draw_progress_bar 54
 
-    # install terraform (lsb_release broken)
+    # install terraform
     curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
     sudo apt-add-repository -y "deb [arch=amd64] https://apt.releases.hashicorp.com \$RELEASE_NAME main"
     sudo apt-get update
