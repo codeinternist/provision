@@ -204,13 +204,13 @@ desktop_icon() {
     file=$HOME/Desktop/$1.desktop
     touch $file
     echo -e " \
-[Desktop Entry]\n \
-Encoding=UTF-8\n \
-Name=$1\n \
-Exec=$3 %U\n \
-Icon=$4\n \
-Terminal=false\n \
-Type=Application\n \
+[Desktop Entry]\n\
+Encoding=UTF-8\n\
+Name=$1\n\
+Exec=$3 %U\n\
+Icon=$4\n\
+Terminal=false\n\
+Type=Application\n\
 Categories=$2;
 " > $file
 }
@@ -232,13 +232,13 @@ desktop_link() {
     file=$HOME/Desktop/$name.desktop
     touch $file
     echo -e " \
-[Desktop Entry]\n \
-Encoding=UTF-8\n \
-Name=$name\n \
-Exec=$exec\n \
-Icon=$icon\n \
-Terminal=false\n \
-Type=Application\n \
+[Desktop Entry]\n\
+Encoding=UTF-8\n\
+Name=$name\n\
+Exec=$exec\n\
+Icon=$icon\n\
+Terminal=false\n\
+Type=Application\n\
 Categories=$type;
 " > $file
 }
@@ -248,13 +248,13 @@ menu_icon() {
     file=$HOME/.local/share/applications/$1.desktop
     touch $file
     echo -e " \
-[Desktop Entry]\n \
-Encoding=UTF-8\n \
-Name=$1\n \
-Exec=$3 %U\n \
-Icon=$4\n \
-Terminal=false\n \
-Type=Application\n \
+[Desktop Entry]\n\
+Encoding=UTF-8\n\
+Name=$1\n\
+Exec=$3 %U\n\
+Icon=$4\n\
+Terminal=false\n\
+Type=Application\n\
 Categories=$2;
 " > $file
 }
@@ -289,21 +289,21 @@ if [[ -n "$settings" ]]; then
 
     # add bash helpers
     echo -e " \
-#!/bin/bash\n \
-\n \
-# bash aliases\n \
-alias ..=\"cd ..\"\n \
-alias lsa=\"ls -al\"\n \
-alias psx=\"ps auxf\"\n \
-alias psu=\"ps -fjH -u \$USER\"\n \
-\n \
-# bash functions\n \
-cdr() { cd \$HOME/source/\$1; }\n \
-context() { [[ -n \$1 ]] && export \$(grep -v '^#' \$1 | xargs); }\n \
-detach() { [[ -n \$1 ]] && \$@ &>/dev/null & }\n \
-mkcd() { mkdir -p \$1; cd \$1; }\n \
-rerc() { source ~/.bashrc; source ~/.bash_aliases; source ~/.bash_exports; }\n \
-weather() { zip=80204; [[ -n \$1 ]] && zip=\$1; curl https://wttr.in/\$zip; }\n \
+#!/bin/bash\n\
+\n\
+# bash aliases\n\
+alias ..=\"cd ..\"\n\
+alias lsa=\"ls -al\"\n\
+alias psx=\"ps auxf\"\n\
+alias psu=\"ps -fjH -u \$USER\"\n\
+\n\
+# bash functions\n\
+cdr() { cd \$HOME/source/\$1; }\n\
+context() { [[ -n \$1 ]] && export \$(grep -v '^#' \$1 | xargs); }\n\
+detach() { [[ -n \$1 ]] && \$@ &>/dev/null & }\n\
+mkcd() { mkdir -p \$1; cd \$1; }\n\
+rerc() { source ~/.bashrc; source ~/.bash_aliases; source ~/.bash_exports; }\n\
+weather() { zip=80204; [[ -n \$1 ]] && zip=\$1; curl https://wttr.in/\$zip; }\n\
 " >> $HOME/.bash_aliases
     draw_progress_bar 6
 
@@ -315,350 +315,350 @@ weather() { zip=80204; [[ -n \$1 ]] && zip=\$1; curl https://wttr.in/\$zip; }\n 
 
     # add agnoster prompt   FIXME 220 syntax error unexpected token '||'
     echo -e " \
-# ~/.bashrc: executed by bash(1) for non-login shells.\n \
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)\n \
-# for examples\n \
-\n \
-# If not running interactively, don't do anything\n \
-case \$- in\n \
-    *i*) ;;\n \
-      *) return;;\n \
-esac\n \
-\n \
-# don't put duplicate lines or lines starting with space in the history.\n \
-# See bash(1) for more options\n \
-HISTCONTROL=ignoreboth\n \
-\n \
-# append to the history file, don't overwrite it\n \
-shopt -s histappend\n \
-\n \
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)\n \
-HISTSIZE=1000\n \
-HISTFILESIZE=2000\n \
-\n \
-# check the window size after each command and, if necessary,\n \
-# update the values of LINES and COLUMNS.\n \
-shopt -s checkwinsize\n \
-\n \
-# If set, the pattern \"**\" used in a pathname expansion context will\n \
-# match all files and zero or more directories and subdirectories.\n \
-#shopt -s globstar\n \
-\n \
-# make less more friendly for non-text input files, see lesspipe(1)\n \
-[ -x /usr/bin/lesspipe ] && eval \"\$(SHELL=/bin/sh lesspipe)\"\n \
-\n \
-# set variable identifying the chroot you work in (used in the prompt below)\n \
-if [ -z \"\${debian_chroot:-}\" ] && [ -r /etc/debian_chroot ]; then\n \
-    debian_chroot=\$(cat /etc/debian_chroot)\n \
-fi\n \
-\n \
-PROMPT_DIRTRIM=4\n \
-\n \
-######################################################################\n \
-DEBUG=0\n \
-debug() {\n \
-    if [[ \${DEBUG} -ne 0 ]]; then\n \
-        >&2 echo -e \$*\n \
-    fi\n \
-}\n \
-\n \
-######################################################################\n \
-### Segment drawing\n \
-# A few utility functions to make it easy and re-usable to draw segmented prompts\n \
-\n \
-CURRENT_BG='NONE'\n \
-CURRENT_RBG='NONE'\n \
-SEGMENT_SEPARATOR=''\n \
-RIGHT_SEPARATOR=''\n \
-LEFT_SUBSEG=''\n \
-RIGHT_SUBSEG=''\n \
-\n \
-text_effect() {\n \
-    case \"\$1\" in\n \
-        reset)      echo 0;;\n \
-        bold)       echo 1;;\n \
-        underline)  echo 4;;\n \
-    esac\n \
-}\n \
-\n \
-# to add colors, see\n \
-# http://bitmote.com/index.php?post/2012/11/19/Using-ANSI-Color-Codes-to-Colorize-Your-Bash-Prompt-on-Linux\n \
-# under the \"256 (8-bit) Colors\" section, and follow the example for orange below\n \
-fg_color() {\n \
-    case \"\$1\" in\n \
-        black)      echo 38\;5\;0;;\n \
-        red)        echo 31;;\n \
-        green)      echo 38\;5\;22;;\n \
-        yellow)     echo 38\;5\;184;;\n \
-        blue)       echo 38\;5\;19;;\n \
-        magenta)    echo 35;;\n \
-        cyan)       echo 36;;\n \
-        white)      echo 38\;5\;15;;\n \
-        orange)     echo 38\;5\;166;;\n \
-        darkgrey)   echo 38\;5\;236;;\n \
-        navy)       echo 38\;5\;19;;\n \
-    esac\n \
-}\n \
-\n \
-bg_color() {\n \
-    case \"\$1\" in\n \
-        black)      echo 48\;5\;0;;\n \
-        red)        echo 41;;\n \
-        green)      echo 48\;5\;22;;\n \
-        yellow)     echo 48\;5\;184;;\n \
-        blue)       echo 48\;5\;19;;\n \
-        magenta)    echo 45;;\n \
-        cyan)       echo 46;;\n \
-        white)      echo 48\;5\;15;;\n \
-        orange)     echo 48\;5\;166;;\n \
-        darkgrey)   echo 48\;5\;236;;\n \
-        navy)       echo 48\;5\;19;;\n \
-    esac;\n \
-}\n \
-\n \
-ansi() {\n \
-    local seq\n \
-    declare -a mycodes=(\"\${!1}\")\n \
-\n \
-    debug \"ansi: \${!1} all: \$* aka \${mycodes[@]}\"\n \
-\n \
-    seq=\"\"\n \
-    for ((i = 0; i < \${#mycodes[@]}; i++)); do\n \
-        if [[ -n \$seq ]]; then\n \
-            seq=\"\${seq};\"\n \
-        fi\n \
-        seq=\"\${seq}\${mycodes[\$i]}\"\n \
-    done\n \
-    debug \"ansi debug:\" '\\[\\033['\${seq}'m\\]'\n \
-    echo -ne '\[\033['\${seq}'m\]'\n \
-    # PR=\"\$PR\[\033[\${seq}m\]\"\n \
-}\n \
-\n \
-ansi_single() {\n \
-    echo -ne '\[\033['\$1'm\]'\n \
-}\n \
-\n \
-# Begin a segment\n \
-# Takes two arguments, background and foreground. Both can be omitted,\n \
-# rendering default background/foreground.\n \
-prompt_segment() {\n \
-    local bg fg\n \
-    declare -a codes\n \
-\n \
-    debug \"Prompting \$1 \$2 \$3\"\n \
-\n \
-    # if commented out from kruton's original... I'm not clear\n \
-    # if it did anything, but it messed up things like\n \
-    # prompt_status - Erik 1/14/17\n \
-\n \
-    #    if [[ -z \$1 || ( -z \$2 && \$2 != default ) ]]; then\n \
-    codes=(\"\${codes[@]}\" \$(text_effect reset))\n \
-    #    fi\n \
-    if [[ -n \$1 ]]; then\n \
-        bg=\$(bg_color \$1)\n \
-        codes=(\"\${codes[@]}\" \$bg)\n \
-        debug \"Added \$bg as background to codes\"\n \
-    fi\n \
-    if [[ -n \$2 ]]; then\n \
-        fg=\$(fg_color \$2)\n \
-        codes=(\"\${codes[@]}\" \$fg)\n \
-        debug \"Added \$fg as foreground to codes\"\n \
-    fi\n \
-\n \
-    debug \"Codes: \"\n \
-    # declare -p codes\n \
-\n \
-    if [[ \$CURRENT_BG != NONE && \$1 != \$CURRENT_BG ]]; then\n \
-        declare -a intermediate=(\$(fg_color \$CURRENT_BG) \$(bg_color \$1))\n \
-        debug \"pre prompt \" \$(ansi intermediate[@])\n \
-        PR=\"\$PR \$(ansi intermediate[@])\$SEGMENT_SEPARATOR\"\n \
-        debug \"post prompt \" \$(ansi codes[@])\n \
-        PR=\"\$PR\$(ansi codes[@]) \"\n \
-    else\n \
-        debug \"no current BG, codes is \$codes[@]\"\n \
-        PR=\"\$PR\$(ansi codes[@]) \"\n \
-    fi\n \
-    CURRENT_BG=\$1\n \
-    [[ -n \$3 ]] && PR=\"\$PR\$3\"\n \
-}\n \
-\n \
-# End the prompt, closing any open segments\n \
-prompt_end() {\n \
-    if [[ -n \$CURRENT_BG ]]; then\n \
-        declare -a codes=(\$(text_effect reset) \$(fg_color \$CURRENT_BG))\n \
-        PR=\"\$PR \$(ansi codes[@])\$SEGMENT_SEPARATOR\"\n \
-    fi\n \
-    declare -a reset=(\$(text_effect reset))\n \
-    PR=\"\$PR \$(ansi reset[@])\"\n \
-    CURRENT_BG=''\n \
-}\n \
-\n \
-### virtualenv prompt\n \
-prompt_virtualenv() {\n \
-    if [[ -n \$VIRTUAL_ENV ]]; then\n \
-        color=cyan\n \
-        prompt_segment \$color \$PRIMARY_FG\n \
-        prompt_segment \$color white \"\$(basename \$VIRTUAL_ENV)\"\n \
-    fi\n \
-}\n \
-\n \
-\n \
-### Prompt components\n \
-# Each component will draw itself, and hide itself if no information needs to be shown\n \
-\n \
-# Context: user@hostname (who am I and where am I)\n \
-prompt_context() {\n \
-    local user=`whoami`\n \
-\n \
-    if [[ \$user != \$DEFAULT_USER || -n \$SSH_CLIENT ]]; then\n \
-        prompt_segment darkgrey default \"\$user\"\n \
-    fi\n \
-}\n \
-\n \
-# prints history followed by HH:MM, useful for remembering what\n \
-# we did previously\n \
-prompt_histdt() {\n \
-    prompt_segment black default \"\! [\A]\"\n \
-}\n \
-\n \
-\n \
-git_status_dirty() {\n \
-    dirty=\$(git status -s 2> /dev/null | tail -n 1)\n \
-    [[ -n \$dirty ]] && echo \" ●\"\n \
-}\n \
-\n \
-# Git: branch/detached head, dirty status\n \
-prompt_git() {\n \
-    local ref dirty\n \
-    if \$(git rev-parse --is-inside-work-tree >/dev/null 2>&1); then\n \
-        ZSH_THEME_GIT_PROMPT_DIRTY='±'\n \
-        dirty=\$(git_status_dirty)\n \
-        ref=\$(git symbolic-ref HEAD 2> /dev/null) \\n \
-            || ref=\"➦ \$(git describe --exact-match --tags HEAD 2> /dev/null)\" \\n \
-            || ref=\"➦ \$(git show-ref --head -s --abbrev | head -n1 2> /dev/null)\"\n \
-        if [[ -n \$dirty ]]; then\n \
-            prompt_segment yellow black\n \
-        else\n \
-            prompt_segment green white\n \
-        fi\n \
-        PR=\"\$PR\${ref/refs\/heads\// }\$dirty\"\n \
-    fi\n \
-}\n \
-\n \
-# Mercurial: clean, modified and uncomitted files\n \
-prompt_hg() {\n \
-    local rev st branch\n \
-    if \$(hg id >/dev/null 2>&1); then\n \
-        if \$(hg prompt >/dev/null 2>&1); then\n \
-            if [[ \$(hg prompt \"{status|unknown}\") = \"?\" ]]; then\n \
-                # if files are not added\n \
-                prompt_segment red white\n \
-                st='±'\n \
-            elif [[ -n \$(hg prompt \"{status|modified}\") ]]; then\n \
-                # if any modification\n \
-                prompt_segment yellow black\n \
-                st='±'\n \
-            else\n \
-                # if working copy is clean\n \
-                prompt_segment green black \$CURRENT_FG\n \
-            fi\n \
-            PR=\"\$PR\$(hg prompt \"☿ {rev}@{branch}\") \$st\"\n \
-        else\n \
-            st=\"\"\n \
-            rev=\$(hg id -n 2>/dev/null | sed 's/[^-0-9]//g')\n \
-            branch=\$(hg id -b 2>/dev/null)\n \
-            if `hg st | grep -q \"^\?\"`; then\n \
-                prompt_segment red white\n \
-                st='±'\n \
-            elif `hg st | grep -q \"^[MA]\"`; then\n \
-                prompt_segment yellow black\n \
-                st='±'\n \
-            else\n \
-                prompt_segment green black \$CURRENT_FG\n \
-            fi\n \
-            PR=\"\$PR☿ \$rev@\$branch \$st\"\n \
-        fi\n \
-    fi\n \
-}\n \
-\n \
-# Dir: current working directory\n \
-prompt_dir() {\n \
-    prompt_segment blue white '\w'\n \
-}\n \
-\n \
-# Status:\n \
-# - was there an error\n \
-# - am I root\n \
-# - are there background jobs?\n \
-prompt_status() {\n \
-    local symbols\n \
-    symbols=()\n \
-    [[ \$RETVAL -ne 0 ]] && symbols+=\"\$(ansi_single \$(fg_color red))✘\"\n \
-    [[ \$UID -eq 0 ]] && symbols+=\"\$(ansi_single \$(fg_color yellow))⚡\"\n \
-    [[ \$(jobs -l | wc -l) -gt 0 ]] && symbols+=\"\$(ansi_single \$(fg_color cyan))⚙\"\n \
-\n \
-    [[ -n \"\$symbols\" ]] && prompt_segment black default \"\$symbols\"\n \
-}\n \
-\n \
-build_prompt() {\n \
-    [[ ! -z \${AG_EMACS_DIR+x} ]] && prompt_emacsdir\n \
-    prompt_status\n \
-    #[[ -z \${AG_NO_HIST+x} ]] && prompt_histdt\n \
-    [[ -z \${AG_NO_CONTEXT+x} ]] && prompt_context\n \
-    prompt_virtualenv\n \
-    prompt_dir\n \
-    prompt_git\n \
-    prompt_hg\n \
-    prompt_end\n \
-}\n \
-\n \
-set_bash_prompt() {\n \
-    RETVAL=\$?\n \
-    PR=\"\"\n \
-    PRIGHT=\"\"\n \
-    CURRENT_BG=NONE\n \
-    PR=\"\$(ansi_single \$(text_effect reset))\"\n \
-    build_prompt\n \
-\n \
-    # uncomment below to use right prompt\n \
-    #     PS1='\[\$(tput sc; printf \"%*s\" \$COLUMNS \"\$PRIGHT\"; tput rc)\]'\$PR\n \
-    PS1=\$PR\n \
-}\n \
-\n \
-PROMPT_COMMAND=set_bash_prompt\n \
-\n \
-# some more ls aliases\n \
-alias ll='ls -alF'\n \
-alias la='ls -A'\n \
-alias l='ls -CF'\n \
-\n \
-# Add an \"alert\" alias for long running commands.  Use like so:\n \
-#   sleep 10; alert\n \
-alias alert='notify-send --urgency=low -i \"\$([ \$? = 0 ] && echo terminal || echo error)\" \"\$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert\$//'\'')\"'\n \
-\n \
-# Alias definitions.\n \
-# You may want to put all your additions into a separate file like\n \
-# ~/.bash_aliases, instead of adding them here directly.\n \
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.\n \
-\n \
-if [ -f ~/.bash_aliases ]; then\n \
-    . ~/.bash_aliases\n \
-fi\n \
-\n \
-if [ -f ~/.bash_exports ]; then\n \
-    . ~/.bash_exports\n \
-fi\n \
-\n \
-# enable programmable completion features (you don't need to enable\n \
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile\n \
-# sources /etc/bash.bashrc).\n \
-if ! shopt -oq posix; then\n \
-    if [ -f /usr/share/bash-completion/bash_completion ]; then\n \
-        . /usr/share/bash-completion/bash_completion\n \
-    elif [ -f /etc/bash_completion ]; then\n \
-        . /etc/bash_completion\n \
-    fi\n \
-fi\n \
+# ~/.bashrc: executed by bash(1) for non-login shells.\n\
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)\n\
+# for examples\n\
+\n\
+# If not running interactively, don't do anything\n\
+case \$- in\n\
+    *i*) ;;\n\
+      *) return;;\n\
+esac\n\
+\n\
+# don't put duplicate lines or lines starting with space in the history.\n\
+# See bash(1) for more options\n\
+HISTCONTROL=ignoreboth\n\
+\n\
+# append to the history file, don't overwrite it\n\
+shopt -s histappend\n\
+\n\
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)\n\
+HISTSIZE=1000\n\
+HISTFILESIZE=2000\n\
+\n\
+# check the window size after each command and, if necessary,\n\
+# update the values of LINES and COLUMNS.\n\
+shopt -s checkwinsize\n\
+\n\
+# If set, the pattern \"**\" used in a pathname expansion context will\n\
+# match all files and zero or more directories and subdirectories.\n\
+#shopt -s globstar\n\
+\n\
+# make less more friendly for non-text input files, see lesspipe(1)\n\
+[ -x /usr/bin/lesspipe ] && eval \"\$(SHELL=/bin/sh lesspipe)\"\n\
+\n\
+# set variable identifying the chroot you work in (used in the prompt below)\n\
+if [ -z \"\${debian_chroot:-}\" ] && [ -r /etc/debian_chroot ]; then\n\
+    debian_chroot=\$(cat /etc/debian_chroot)\n\
+fi\n\
+\n\
+PROMPT_DIRTRIM=4\n\
+\n\
+######################################################################\n\
+DEBUG=0\n\
+debug() {\n\
+    if [[ \${DEBUG} -ne 0 ]]; then\n\
+        >&2 echo -e \$*\n\
+    fi\n\
+}\n\
+\n\
+######################################################################\n\
+### Segment drawing\n\
+# A few utility functions to make it easy and re-usable to draw segmented prompts\n\
+\n\
+CURRENT_BG='NONE'\n\
+CURRENT_RBG='NONE'\n\
+SEGMENT_SEPARATOR=''\n\
+RIGHT_SEPARATOR=''\n\
+LEFT_SUBSEG=''\n\
+RIGHT_SUBSEG=''\n\
+\n\
+text_effect() {\n\
+    case \"\$1\" in\n\
+        reset)      echo 0;;\n\
+        bold)       echo 1;;\n\
+        underline)  echo 4;;\n\
+    esac\n\
+}\n\
+\n\
+# to add colors, see\n\
+# http://bitmote.com/index.php?post/2012/11/19/Using-ANSI-Color-Codes-to-Colorize-Your-Bash-Prompt-on-Linux\n\
+# under the \"256 (8-bit) Colors\" section, and follow the example for orange below\n\
+fg_color() {\n\
+    case \"\$1\" in\n\
+        black)      echo 38\;5\;0;;\n\
+        red)        echo 31;;\n\
+        green)      echo 38\;5\;22;;\n\
+        yellow)     echo 38\;5\;184;;\n\
+        blue)       echo 38\;5\;19;;\n\
+        magenta)    echo 35;;\n\
+        cyan)       echo 36;;\n\
+        white)      echo 38\;5\;15;;\n\
+        orange)     echo 38\;5\;166;;\n\
+        darkgrey)   echo 38\;5\;236;;\n\
+        navy)       echo 38\;5\;19;;\n\
+    esac\n\
+}\n\
+\n\
+bg_color() {\n\
+    case \"\$1\" in\n\
+        black)      echo 48\;5\;0;;\n\
+        red)        echo 41;;\n\
+        green)      echo 48\;5\;22;;\n\
+        yellow)     echo 48\;5\;184;;\n\
+        blue)       echo 48\;5\;19;;\n\
+        magenta)    echo 45;;\n\
+        cyan)       echo 46;;\n\
+        white)      echo 48\;5\;15;;\n\
+        orange)     echo 48\;5\;166;;\n\
+        darkgrey)   echo 48\;5\;236;;\n\
+        navy)       echo 48\;5\;19;;\n\
+    esac;\n\
+}\n\
+\n\
+ansi() {\n\
+    local seq\n\
+    declare -a mycodes=(\"\${!1}\")\n\
+\n\
+    debug \"ansi: \${!1} all: \$* aka \${mycodes[@]}\"\n\
+\n\
+    seq=\"\"\n\
+    for ((i = 0; i < \${#mycodes[@]}; i++)); do\n\
+        if [[ -n \$seq ]]; then\n\
+            seq=\"\${seq};\"\n\
+        fi\n\
+        seq=\"\${seq}\${mycodes[\$i]}\"\n\
+    done\n\
+    debug \"ansi debug:\" '\\[\\033['\${seq}'m\\]'\n\
+    echo -ne '\[\033['\${seq}'m\]'\n\
+    # PR=\"\$PR\[\033[\${seq}m\]\"\n\
+}\n\
+\n\
+ansi_single() {\n\
+    echo -ne '\[\033['\$1'm\]'\n\
+}\n\
+\n\
+# Begin a segment\n\
+# Takes two arguments, background and foreground. Both can be omitted,\n\
+# rendering default background/foreground.\n\
+prompt_segment() {\n\
+    local bg fg\n\
+    declare -a codes\n\
+\n\
+    debug \"Prompting \$1 \$2 \$3\"\n\
+\n\
+    # if commented out from kruton's original... I'm not clear\n\
+    # if it did anything, but it messed up things like\n\
+    # prompt_status - Erik 1/14/17\n\
+\n\
+    #    if [[ -z \$1 || ( -z \$2 && \$2 != default ) ]]; then\n\
+    codes=(\"\${codes[@]}\" \$(text_effect reset))\n\
+    #    fi\n\
+    if [[ -n \$1 ]]; then\n\
+        bg=\$(bg_color \$1)\n\
+        codes=(\"\${codes[@]}\" \$bg)\n\
+        debug \"Added \$bg as background to codes\"\n\
+    fi\n\
+    if [[ -n \$2 ]]; then\n\
+        fg=\$(fg_color \$2)\n\
+        codes=(\"\${codes[@]}\" \$fg)\n\
+        debug \"Added \$fg as foreground to codes\"\n\
+    fi\n\
+\n\
+    debug \"Codes: \"\n\
+    # declare -p codes\n\
+\n\
+    if [[ \$CURRENT_BG != NONE && \$1 != \$CURRENT_BG ]]; then\n\
+        declare -a intermediate=(\$(fg_color \$CURRENT_BG) \$(bg_color \$1))\n\
+        debug \"pre prompt \" \$(ansi intermediate[@])\n\
+        PR=\"\$PR \$(ansi intermediate[@])\$SEGMENT_SEPARATOR\"\n\
+        debug \"post prompt \" \$(ansi codes[@])\n\
+        PR=\"\$PR\$(ansi codes[@]) \"\n\
+    else\n\
+        debug \"no current BG, codes is \$codes[@]\"\n\
+        PR=\"\$PR\$(ansi codes[@]) \"\n\
+    fi\n\
+    CURRENT_BG=\$1\n\
+    [[ -n \$3 ]] && PR=\"\$PR\$3\"\n\
+}\n\
+\n\
+# End the prompt, closing any open segments\n\
+prompt_end() {\n\
+    if [[ -n \$CURRENT_BG ]]; then\n\
+        declare -a codes=(\$(text_effect reset) \$(fg_color \$CURRENT_BG))\n\
+        PR=\"\$PR \$(ansi codes[@])\$SEGMENT_SEPARATOR\"\n\
+    fi\n\
+    declare -a reset=(\$(text_effect reset))\n\
+    PR=\"\$PR \$(ansi reset[@])\"\n\
+    CURRENT_BG=''\n\
+}\n\
+\n\
+### virtualenv prompt\n\
+prompt_virtualenv() {\n\
+    if [[ -n \$VIRTUAL_ENV ]]; then\n\
+        color=cyan\n\
+        prompt_segment \$color \$PRIMARY_FG\n\
+        prompt_segment \$color white \"\$(basename \$VIRTUAL_ENV)\"\n\
+    fi\n\
+}\n\
+\n\
+\n\
+### Prompt components\n\
+# Each component will draw itself, and hide itself if no information needs to be shown\n\
+\n\
+# Context: user@hostname (who am I and where am I)\n\
+prompt_context() {\n\
+    local user=`whoami`\n\
+\n\
+    if [[ \$user != \$DEFAULT_USER || -n \$SSH_CLIENT ]]; then\n\
+        prompt_segment darkgrey default \"\$user\"\n\
+    fi\n\
+}\n\
+\n\
+# prints history followed by HH:MM, useful for remembering what\n\
+# we did previously\n\
+prompt_histdt() {\n\
+    prompt_segment black default \"\! [\A]\"\n\
+}\n\
+\n\
+\n\
+git_status_dirty() {\n\
+    dirty=\$(git status -s 2> /dev/null | tail -n 1)\n\
+    [[ -n \$dirty ]] && echo \" ●\"\n\
+}\n\
+\n\
+# Git: branch/detached head, dirty status\n\
+prompt_git() {\n\
+    local ref dirty\n\
+    if \$(git rev-parse --is-inside-work-tree >/dev/null 2>&1); then\n\
+        ZSH_THEME_GIT_PROMPT_DIRTY='±'\n\
+        dirty=\$(git_status_dirty)\n\
+        ref=\$(git symbolic-ref HEAD 2> /dev/null) \\ \n\
+            || ref=\"➦ \$(git describe --exact-match --tags HEAD 2> /dev/null)\" \\ \n\
+            || ref=\"➦ \$(git show-ref --head -s --abbrev | head -n1 2> /dev/null)\"\n\
+        if [[ -n \$dirty ]]; then\n\
+            prompt_segment yellow black\n\
+        else\n\
+            prompt_segment green white\n\
+        fi\n\
+        PR=\"\$PR\${ref/refs\/heads\// }\$dirty\"\n\
+    fi\n\
+}\n\
+\n\
+# Mercurial: clean, modified and uncomitted files\n\
+prompt_hg() {\n\
+    local rev st branch\n\
+    if \$(hg id >/dev/null 2>&1); then\n\
+        if \$(hg prompt >/dev/null 2>&1); then\n\
+            if [[ \$(hg prompt \"{status|unknown}\") = \"?\" ]]; then\n\
+                # if files are not added\n\
+                prompt_segment red white\n\
+                st='±'\n\
+            elif [[ -n \$(hg prompt \"{status|modified}\") ]]; then\n\
+                # if any modification\n\
+                prompt_segment yellow black\n\
+                st='±'\n\
+            else\n\
+                # if working copy is clean\n\
+                prompt_segment green black \$CURRENT_FG\n\
+            fi\n\
+            PR=\"\$PR\$(hg prompt \"☿ {rev}@{branch}\") \$st\"\n\
+        else\n\
+            st=\"\"\n\
+            rev=\$(hg id -n 2>/dev/null | sed 's/[^-0-9]//g')\n\
+            branch=\$(hg id -b 2>/dev/null)\n\
+            if `hg st | grep -q \"^\?\"`; then\n\
+                prompt_segment red white\n\
+                st='±'\n\
+            elif `hg st | grep -q \"^[MA]\"`; then\n\
+                prompt_segment yellow black\n\
+                st='±'\n\
+            else\n\
+                prompt_segment green black \$CURRENT_FG\n\
+            fi\n\
+            PR=\"\$PR☿ \$rev@\$branch \$st\"\n\
+        fi\n\
+    fi\n\
+}\n\
+\n\
+# Dir: current working directory\n\
+prompt_dir() {\n\
+    prompt_segment blue white '\w'\n\
+}\n\
+\n\
+# Status:\n\
+# - was there an error\n\
+# - am I root\n\
+# - are there background jobs?\n\
+prompt_status() {\n\
+    local symbols\n\
+    symbols=()\n\
+    [[ \$RETVAL -ne 0 ]] && symbols+=\"\$(ansi_single \$(fg_color red))✘\"\n\
+    [[ \$UID -eq 0 ]] && symbols+=\"\$(ansi_single \$(fg_color yellow))⚡\"\n\
+    [[ \$(jobs -l | wc -l) -gt 0 ]] && symbols+=\"\$(ansi_single \$(fg_color cyan))⚙\"\n\
+\n\
+    [[ -n \"\$symbols\" ]] && prompt_segment black default \"\$symbols\"\n\
+}\n\
+\n\
+build_prompt() {\n\
+    [[ ! -z \${AG_EMACS_DIR+x} ]] && prompt_emacsdir\n\
+    prompt_status\n\
+    #[[ -z \${AG_NO_HIST+x} ]] && prompt_histdt\n\
+    [[ -z \${AG_NO_CONTEXT+x} ]] && prompt_context\n\
+    prompt_virtualenv\n\
+    prompt_dir\n\
+    prompt_git\n\
+    prompt_hg\n\
+    prompt_end\n\
+}\n\
+\n\
+set_bash_prompt() {\n\
+    RETVAL=\$?\n\
+    PR=\"\"\n\
+    PRIGHT=\"\"\n\
+    CURRENT_BG=NONE\n\
+    PR=\"\$(ansi_single \$(text_effect reset))\"\n\
+    build_prompt\n\
+\n\
+    # uncomment below to use right prompt\n\
+    #     PS1='\[\$(tput sc; printf \"%*s\" \$COLUMNS \"\$PRIGHT\"; tput rc)\]'\$PR\n\
+    PS1=\$PR\n\
+}\n\
+\n\
+PROMPT_COMMAND=set_bash_prompt\n\
+\n\
+# some more ls aliases\n\
+alias ll='ls -alF'\n\
+alias la='ls -A'\n\
+alias l='ls -CF'\n\
+\n\
+# Add an \"alert\" alias for long running commands.  Use like so:\n\
+#   sleep 10; alert\n\
+alias alert='notify-send --urgency=low -i \"\$([ \$? = 0 ] && echo terminal || echo error)\" \"\$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert\$//'\'')\"'\n\
+\n\
+# Alias definitions.\n\
+# You may want to put all your additions into a separate file like\n\
+# ~/.bash_aliases, instead of adding them here directly.\n\
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.\n\
+\n\
+if [ -f ~/.bash_aliases ]; then\n\
+    . ~/.bash_aliases\n\
+fi\n\
+\n\
+if [ -f ~/.bash_exports ]; then\n\
+    . ~/.bash_exports\n\
+fi\n\
+\n\
+# enable programmable completion features (you don't need to enable\n\
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile\n\
+# sources /etc/bash.bashrc).\n\
+if ! shopt -oq posix; then\n\
+    if [ -f /usr/share/bash-completion/bash_completion ]; then\n\
+        . /usr/share/bash-completion/bash_completion\n\
+    elif [ -f /etc/bash_completion ]; then\n\
+        . /etc/bash_completion\n\
+    fi\n\
+fi\n\
 \
 " > $HOME/.bashrc
     draw_progress_bar 10
@@ -690,122 +690,122 @@ if [[ -n "$dev" ]]; then
 
     # setup (broken)
     mkdir -p $HOME/source
-    echo -e "\n \
-# docker aliases\n \
-alias dcd=\"docker-compose down\"\n \
-alias dclf=\"docker-compose logs --follow\"\n \
-alias dcb=\"docker-compose up --build\"\n \
-alias dcbd=\"docker-compose up --build -d\"\n \
-alias dcu=\"docker-compose up\"\n \
-alias dcud=\"docker-compose up -d\"\n \
-alias dils=\"docker image ls -a\"\n \
-alias dni=\"docker network inspect\"\n \
-alias dnls=\"docker network ls\"\n \
-alias dps=\"docker ps -a\"\n \
-\n \
-# docker functions\n \
-dnuke() { docker kill \$(docker ps -aq); docker rm \$(docker ps -aq); docker rmi \$(docker image ls -q); }\n \
-dup() { tag=\$(tr -dc a-z0-9 </dev/urandom | head -c 10); docker build -t \$tag .; docker run -e LOG_LEVEL=\"debug\" -p 50051:50051 \$tag; }\n \
-dupe() { tag=\$(tr -dc a-z0-9 </dev/urandom | head -c 10); docker build -t \$tag .; docker run -e LOG_LEVEL=\"debug\" -e \$(array_join \" -e \" \"\$@\") -p 50051:50051 \$tag; }\n \
-dxi() { [[ -n \$1 ]] && docker exec -it \$1 bash; }\n \
-logs() { [[ -n \$1 ]] && { id=\$(docker ps -a | grep \"\$1\" | sed 's/ .*//'); [[ -n \$id ]] && docker container logs \$id; }; }\n \
-\n \
-# git aliases\n \
-alias ga=\"\$1\"\n \
-alias ga.=\"\$1\"\n \
-alias gb=\"\$1\"\n \
-alias gca=\"\$1\"\n \
-alias gcd=\"\$1\"\n \
-alias gd=\"\$1\"\n \
-alias gdh=\"\$1\"\n \
-alias gf=\"\$1\"\n \
-alias gl=\"\$1\"\n \
-alias gp=\"\$1\"\n \
-alias gpsf=\"\$1\"\n \
-alias gr=\"\$1\"\n \
-alias grs=\"\$1\"\n \
-alias grw=\"\$1\"\n \
-alias gs=\"\$1\"\n \
-alias gsa=\"\$1\"\n \
-alias gsd=\"\$1\"\n \
-alias gsl=\"\$1\"\n \
-alias gsp=\"\$1\"\n \
-alias gss=\"\$1\"\n \
-alias gst=\"\$1\"\n \
-alias tags=\"\$1\"\n \
-\n \
-# git functions\n \
-gcm() { [[ -n \"\$1\" ]] && { msg=\"\$@\"; git commit -m \"\$(git_branch): \$msg\"; }; }\n \
-generic() { git checkout -b generic; git push --set-upstream origin generic; git checkout -; git branch -d generic; }\n \
-git_branch() { git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'; }\n \
-gpcm() { [[ -n \"\$1\" ]] && { msg=\"\$(git_branch): \$@\"; black .; ga.; git commit -m \"\$msg\"; gps; }; }\n \
-gps() {\n \
-    git push\n \
+    echo -e "\n\
+# docker aliases\n\
+alias dcd=\"docker-compose down\"\n\
+alias dclf=\"docker-compose logs --follow\"\n\
+alias dcb=\"docker-compose up --build\"\n\
+alias dcbd=\"docker-compose up --build -d\"\n\
+alias dcu=\"docker-compose up\"\n\
+alias dcud=\"docker-compose up -d\"\n\
+alias dils=\"docker image ls -a\"\n\
+alias dni=\"docker network inspect\"\n\
+alias dnls=\"docker network ls\"\n\
+alias dps=\"docker ps -a\"\n\
+\n\
+# docker functions\n\
+dnuke() { docker kill \$(docker ps -aq); docker rm \$(docker ps -aq); docker rmi \$(docker image ls -q); }\n\
+dup() { tag=\$(tr -dc a-z0-9 </dev/urandom | head -c 10); docker build -t \$tag .; docker run -e LOG_LEVEL=\"debug\" -p 50051:50051 \$tag; }\n\
+dupe() { tag=\$(tr -dc a-z0-9 </dev/urandom | head -c 10); docker build -t \$tag .; docker run -e LOG_LEVEL=\"debug\" -e \$(array_join \" -e \" \"\$@\") -p 50051:50051 \$tag; }\n\
+dxi() { [[ -n \$1 ]] && docker exec -it \$1 bash; }\n\
+logs() { [[ -n \$1 ]] && { id=\$(docker ps -a | grep \"\$1\" | sed 's/ .*//'); [[ -n \$id ]] && docker container logs \$id; }; }\n\
+\n\
+# git aliases\n\
+alias ga=\"\$1\"\n\
+alias ga.=\"\$1\"\n\
+alias gb=\"\$1\"\n\
+alias gca=\"\$1\"\n\
+alias gcd=\"\$1\"\n\
+alias gd=\"\$1\"\n\
+alias gdh=\"\$1\"\n\
+alias gf=\"\$1\"\n\
+alias gl=\"\$1\"\n\
+alias gp=\"\$1\"\n\
+alias gpsf=\"\$1\"\n\
+alias gr=\"\$1\"\n\
+alias grs=\"\$1\"\n\
+alias grw=\"\$1\"\n\
+alias gs=\"\$1\"\n\
+alias gsa=\"\$1\"\n\
+alias gsd=\"\$1\"\n\
+alias gsl=\"\$1\"\n\
+alias gsp=\"\$1\"\n\
+alias gss=\"\$1\"\n\
+alias gst=\"\$1\"\n\
+alias tags=\"\$1\"\n\
+\n\
+# git functions\n\
+gcm() { [[ -n \"\$1\" ]] && { msg=\"\$@\"; git commit -m \"\$(git_branch): \$msg\"; }; }\n\
+generic() { git checkout -b generic; git push --set-upstream origin generic; git checkout -; git branch -d generic; }\n\
+git_branch() { git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/'; }\n\
+gpcm() { [[ -n \"\$1\" ]] && { msg=\"\$(git_branch): \$@\"; black .; ga.; git commit -m \"\$msg\"; gps; }; }\n\
+gps() {\n\
+    git push\n\
     branch=\$(git branch 2>/dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/\1/')
-    if [[ \"\$branch\" == \"main\" ]] || [[ \"\$branch\" == \"master\" ]]; then\n \
-        git checkout -b generic\n \
-        git push --set-upstream origin generic\n \
-        git checkout \$branch\n \
-        git branch -d generic\n \
-    fi\n \
-}\n \
-gpsu() { git push --set-upstream origin \$(git_branch); }\n \
-tag() {\n \
-    if [[ -n \"\$1\" ]]; then\n \
-        dd=\$(date +\"%Y.%m.%d\")\n \
-        ver=\"v/\$dd\"\n \
-        msg=\"\$@\"\n \
-        ct=\$(git tag -l | grep \"\$ver\" | wc -l)\n \
-        [[ \"\$ct\" -ne \"0\" ]] && ver=\"\$ver-\$ct\"\n \
-        git tag -a \"\$ver\" -m \"\$msg\"\n \
-        git push origin \"\$ver\"\n \
-    fi\n \
-}\n \
-wip() { msg=\"\$(git_branch): [WIP]\"; [[ -n \$1 ]] && msg=\"\$msg  \$@\"; git commit -m \"\$msg\"; }\n \
-\n \
-# google cloud aliases\n \
-alias g=\"gcloud\"\n \
-\n \
-# helm aliases\n \
-alias h=\"helm\"\n \
-\n \
-# helm completion\n \
-. <(helm completion bash)\n \
-complete -F __start_helm h\n \
-\n \
-# kubectl aliases\n \
-alias k=\"kubectl\"\n \
-alias kaf=\"kubectl apply -f\"\n \
-alias kdn=\"kubectl describe nodes\"\n \
-alias kdp=\"kubectl describe pods\"\n \
-alias kgns=\"kubectl get namespaces\"\n \
-alias kx=\"kubectl exec\"\n \
-\n \
-# kubectl completion\n \
-. <(kubectl completion bash)\n \
-complete -F __start_kubectl k\n \
-\n \
-# kubectl functions\n \
-kcns() { ns=\$GENERIC_NAMESPACE; [[ -n \"\$1\" ]] && ns=\$1; kubectl config set-context \$(kubectl config current-context) --namespace=\$ns; }\n \
-kgp() { msg=\"\"; [[ -n \"\$1\" ]] && msg=\" --field-selector=spec.nodeName=[\$1]\"; kubectl get pods\$msg; }\n \
-kgpw() { msg=\"\"; [[ -n \"\$1\" ]] && msg=\" --field-selector=spec.nodeName=[\$1]\"; kubectl get pods\$msg -o wide; }\n \
-kxec() { [[ -n \"\$2\" ]] && kubectl exec \$1 -- \$@; }\n \
+    if [[ \"\$branch\" == \"main\" ]] || [[ \"\$branch\" == \"master\" ]]; then\n\
+        git checkout -b generic\n\
+        git push --set-upstream origin generic\n\
+        git checkout \$branch\n\
+        git branch -d generic\n\
+    fi\n\
+}\n\
+gpsu() { git push --set-upstream origin \$(git_branch); }\n\
+tag() {\n\
+    if [[ -n \"\$1\" ]]; then\n\
+        dd=\$(date +\"%Y.%m.%d\")\n\
+        ver=\"v/\$dd\"\n\
+        msg=\"\$@\"\n\
+        ct=\$(git tag -l | grep \"\$ver\" | wc -l)\n\
+        [[ \"\$ct\" -ne \"0\" ]] && ver=\"\$ver-\$ct\"\n\
+        git tag -a \"\$ver\" -m \"\$msg\"\n\
+        git push origin \"\$ver\"\n\
+    fi\n\
+}\n\
+wip() { msg=\"\$(git_branch): [WIP]\"; [[ -n \$1 ]] && msg=\"\$msg  \$@\"; git commit -m \"\$msg\"; }\n\
+\n\
+# google cloud aliases\n\
+alias g=\"gcloud\"\n\
+\n\
+# helm aliases\n\
+alias h=\"helm\"\n\
+\n\
+# helm completion\n\
+. <(helm completion bash)\n\
+complete -F __start_helm h\n\
+\n\
+# kubectl aliases\n\
+alias k=\"kubectl\"\n\
+alias kaf=\"kubectl apply -f\"\n\
+alias kdn=\"kubectl describe nodes\"\n\
+alias kdp=\"kubectl describe pods\"\n\
+alias kgns=\"kubectl get namespaces\"\n\
+alias kx=\"kubectl exec\"\n\
+\n\
+# kubectl completion\n\
+. <(kubectl completion bash)\n\
+complete -F __start_kubectl k\n\
+\n\
+# kubectl functions\n\
+kcns() { ns=\$GENERIC_NAMESPACE; [[ -n \"\$1\" ]] && ns=\$1; kubectl config set-context \$(kubectl config current-context) --namespace=\$ns; }\n\
+kgp() { msg=\"\"; [[ -n \"\$1\" ]] && msg=\" --field-selector=spec.nodeName=[\$1]\"; kubectl get pods\$msg; }\n\
+kgpw() { msg=\"\"; [[ -n \"\$1\" ]] && msg=\" --field-selector=spec.nodeName=[\$1]\"; kubectl get pods\$msg -o wide; }\n\
+kxec() { [[ -n \"\$2\" ]] && kubectl exec \$1 -- \$@; }\n\
 kxit() { cmd=/bin/sh; [[ -n \"\$2\" ]] && cmd=\"\$@\"; [[ -n \"\$1\" ]] && kubectl exec -it \$1 -- \$cmd; }
-\n \
-# python functions\n \
-dvenv() { deactivate; rm -rf venv; }\n \
-venv() { python3 -m venv venv; source venv/bin/activate; pip3 install -r requirements.txt; [[ -f requirements-dev.txt ]] && pip3 install -r requirements-dev.txt; }\n \
-\n \
-# terraform aliases\n \
-alias t=\"terraform\"\n \
-alias tfa=\"terraform apply\"\n \
-alias tfaf=\"terraform apply -auto-approve\"\n \
-alias tfd=\"terraform destroy\"\n \
-alias tfdf=\"terraform destroy -auto-approve\"\n \
-alias tfi=\"terraform init\"\n \
-alias tfo=\"terraform output -json\"\n \
-alias tfp=\"terraform plan\"\n \
-alias tfs=\"terraform show\"\n \
+\n\
+# python functions\n\
+dvenv() { deactivate; rm -rf venv; }\n\
+venv() { python3 -m venv venv; source venv/bin/activate; pip3 install -r requirements.txt; [[ -f requirements-dev.txt ]] && pip3 install -r requirements-dev.txt; }\n\
+\n\
+# terraform aliases\n\
+alias t=\"terraform\"\n\
+alias tfa=\"terraform apply\"\n\
+alias tfaf=\"terraform apply -auto-approve\"\n\
+alias tfd=\"terraform destroy\"\n\
+alias tfdf=\"terraform destroy -auto-approve\"\n\
+alias tfi=\"terraform init\"\n\
+alias tfo=\"terraform output -json\"\n\
+alias tfp=\"terraform plan\"\n\
+alias tfs=\"terraform show\"\n\
 " >> $HOME/.bash_aliases
     draw_progress_bar 14
 
@@ -904,9 +904,9 @@ $RELEASE_NAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     export GOBIN=$HOME/go/bin
     export PATH=$PATH:/usr/local/go/bin:$GOBIN
     echo -e " \
-export GOPATH=\$HOME/go\n \
-export GOBIN=\$HOME/go/bin\n \
-export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n \
+export GOPATH=\$HOME/go\n\
+export GOBIN=\$HOME/go/bin\n\
+export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n\
 " >> $HOME/.bash_exports
     code --install-extension golang.go
     draw_progress_bar 36
@@ -941,9 +941,9 @@ export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n \
     echo "deb-src https://deb.nodesource.com/\$VERSION \$DISTRO main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
     sudo apt-get update
     sudo apt-get install -y nodejs npm
-    echo -e "\n \
-# nodejs settings\n \
-export NODE_OPTIONS=\"--experimental-repl-await\"\n \
+    echo -e "\n\
+# nodejs settings\n\
+export NODE_OPTIONS=\"--experimental-repl-await\"\n\
 " >> $HOME/.bash_exports
     draw_progress_bar 46
 
