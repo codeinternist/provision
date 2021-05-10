@@ -1,5 +1,8 @@
 #!/bin/bash
 
+### settings ###
+RELEASE_NAME=focal
+RELEASE_VERSION=20.04
 
 ### process opts ###
 if [[ -n "$1" ]]; then
@@ -675,7 +678,7 @@ draw_progress_bar 12
 if [[ -n "$dev" ]]; then
     echo -e "\n====== Installing Developer Tools ======\n"
 
-    # setup
+    # setup (broken)
     mkdir -p $HOME/source
     echo -e "\n \
 # docker aliases\n \
@@ -824,24 +827,25 @@ alias tfs=\"terraform show\"\n \
     code --install-extension tomoyukim.vscode-mermaid-editor
     draw_progress_bar 18
     
-    # install arduino
+    # install arduino (broken)
     mkdir -p $HOME/source/arduino
     wget https://downloads.arduino.cc/arduino-1.8.13-linux64.tar.xz -O /tmp/arduino.tar.xz
-    mkdir -p /etc/arduino
-    sudo tar xzf /tmp/arduino.tar.xz -C /etc/arduino
+    sudo mkdir -p /etc/arduino
+    sudo chown `id -nu`:`id -ng` /etc/arduino
+    tar xzf /tmp/arduino.tar.xz -C /etc/arduino
     /etc/arduino/install.sh
     draw_progress_bar 20
     
-    # install aws-cli
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+    # install aws-cli (broken)
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O /tmp/awscliv2.zip
     unzip /tmp/awscliv2.zip
     sudo /tmp/aws/install
     draw_progress_bar 22
 
-    # install docker
+    # install docker (broken)
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
-\$(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+\$RELEASE_NAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io
     sudo groupadd docker
@@ -855,9 +859,9 @@ alias tfs=\"terraform show\"\n \
     sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
     draw_progress_bar 26
 
-    # install dotnet
+    # install dotnet (broken)
     mkdir -p $HOME/source/dotnet
-    wget "https://packages.microsoft.com/config/ubuntu/\$(lsb_release -rs)/packages-microsoft-prod.deb" -O /tmp/packages-microsoft-prod.deb
+    wget "https://packages.microsoft.com/config/ubuntu/\$RELEASE_VERSION/packages-microsoft-prod.deb" -O /tmp/packages-microsoft-prod.deb
     sudo dpkg -i /tmp/packages-microsoft-prod.deb
     sudo apt-get update
     sudo apt-get install -y dotnet-sdk-5.0 nuget
@@ -868,17 +872,18 @@ alias tfs=\"terraform show\"\n \
     sudo apt-get install -y g++
     draw_progress_bar 30
 
-    # install gcloud
+    # install gcloud (broken)
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
-    sudo apt-get update && sudo apt-get install -y google-cloud-sdk
+    sudo apt-get update
+    sudo apt-get install -y google-cloud-sdk
     draw_progress_bar 32
 
     # install git
     sudo apt-get install -y git
     draw_progress_bar 34
 
-    # install golang
+    # install golang (maybe not in path)
     mkdir -p $HOME/source/go
     mkdir -p $HOME/go/bin
     mkdir -p $HOME/go/src
@@ -920,7 +925,7 @@ export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n \
     mkdir -p $HOME/source/nodejs
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
     VERSION=node_8.x
-    DISTRO="\$(lsb_release -s -c)"
+    DISTRO="\$RELEASE_NAME"
     echo "deb https://deb.nodesource.com/\$VERSION \$DISTRO main" | sudo tee /etc/apt/sources.list.d/nodesource.list
     echo "deb-src https://deb.nodesource.com/\$VERSION \$DISTRO main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
     sudo apt-get update
@@ -931,7 +936,7 @@ export NODE_OPTIONS=\"--experimental-repl-await\"\n \
 " >> $HOME/.bash_exports
     draw_progress_bar 46
 
-    # install postman
+    # install postman (need postman desktop not agent)
     wget "https://dl-agent.pstmn.io/download/latest/linux" -O /tmp/postman.tar.gz
     sudo tar -C /opt -xzf /tmp/postman.tar.gz
     touch $HOME/.local/share/applications/Postman.desktop
@@ -951,23 +956,23 @@ Categories=Development;
     mkdir -p $HOME/source/python
     sudo add-apt-repository -y ppa:deadsnakes/ppa
     sudo apt-get update
-    sudo apt-get install -y python3.9
-    python3.9 -m pip
+    sudo apt-get install -y python3.10
+    python3.10 -m pip
     pip install aiohttp black codecov fastapi flake8 pytest pytest-asyncio pytest-cov pytest-timeout requests
     code --install-extension ms-python.python
     draw_progress_bar 50
     
-    # install rpi-imager
+    # install rpi-imager (cannot find package)
     sudo apt-get install -y rpi-imager
     draw_progress_bar 52
 
-    # install slack
+    # install slack (cannot find package)
     sudo apt-get install -y slack-desktop
     draw_progress_bar 54
 
-    # install terraform
+    # install terraform (lsb_release broken)
     curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-    sudo apt-add-repository -y "deb [arch=amd64] https://apt.releases.hashicorp.com \$(lsb_release -cs) main"
+    sudo apt-add-repository -y "deb [arch=amd64] https://apt.releases.hashicorp.com \$RELEASE_NAME main"
     sudo apt-get update
     sudo apt-get install -y terraform
     draw_progress_bar 56
@@ -1017,7 +1022,8 @@ if [[ -n "$basic" ]]; then
     firefox /tmp/firefox_multi_account_containers-7.3.0-fx.xpi
     #   configure firefox
     ff_prefs="/etc/firefox/prefs/all-users.js"
-    touch $ff_prefs
+    sudo touch $ff_prefs
+    sudo chown `id -nu`:`id -ng` $ff_prefs
     echo "pref('app.normandy.enabled', false);" >> $ff_prefs
     echo "pref('browser.search.region', 'US');" >> $ff_prefs
     echo "pref('browser.startup.homepage', 'about:blank');" >> $ff_prefs
@@ -1096,7 +1102,8 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
 
     # setup
     sudo dpkg --add-architecture i386
-    mkdir -p /etc/icons
+    sudo mkdir -p /etc/icons
+    sudo chown `id -nu`:`id -ng` /etc/icons
 
     # install discord
     wget "https://dl.discordapp.net/discord-0.0.14.deb" -O /tmp/discord.deb
@@ -1110,7 +1117,6 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     draw_progress_bar 80
 
     # install fusion
-    sudo apt-get update
     wget "https://www.carpeludum.com/download/kega-fusion_3.63-2_i386.deb" -O /tmp/kega-fusion.deb
     sudo gdebi /tmp/kega-fusion.deb
     draw_progress_bar 82
@@ -1124,9 +1130,10 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     draw_progress_bar 86
 
     # install pcsx-reloaded
-    sudo apt-get install pcsxr
+    sudo apt-get install -y pcsxr
     wget "https://the-eye.eu/public/rom/Bios/psx/scph1001.zip" -O /tmp/scph1001.zip
-    mkdir -p /etc/ps_bios/psx
+    sudo mkdir -p /etc/ps_bios/psx
+    sudo chown `id -nu`:`id -ng` /etc/ps_bios/psx
     unzip /tmp/scph1001.zip -d /etc/ps_bios/psx
     draw_progress_bar 88
 
@@ -1135,7 +1142,8 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     sudo apt update
     sudo apt install -y pcsx2
     wget "https://the-eye.eu/public/rom/Bios/ps2/sony_ps2_%28SCPH39001%29.rar" -O /tmp/scph39001.rar
-    mkdir -p /etc/ps_bios/ps2
+    sudo mkdir -p /etc/ps_bios/ps2
+    sudo chown `id -nu`:`id -ng` /etc/ps_bios/ps2
     unrar x /tmp/scph39001.rar /etc/ps_bios/ps2
     draw_progress_bar 90
 
@@ -1162,7 +1170,7 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     sudo apt-key add /tmp/winehq.key
     sudo add-apt-repository -y "deb https://dl.winehq.org/wine-builds/ubuntu/ focal main"
     sudo apt-get update
-    sudo apt-get install --install-recommends winehq-stable
+    sudo apt-get install -y --install-recommends winehq-stable
 fi
 draw_progress_bar 97
 
@@ -1175,7 +1183,7 @@ if [[ -n "$game_icons" ]]; then
     echo -e "\n====== Installing Gaming Icons ======\n"
 
     # setup
-    mkdir -p /etc/icons
+    [[ -d /etc/icons ]] || { sudo mkdir -p /etc/icons; sudo chown `id -nu`:`id -ng` /etc/icons; }
 
     # discord
     sudo wget "https://cdn.imgbin.com/0/17/7/imgbin-discord-computer-servers-teamspeak-discord-icon-4pH3jH6t4ZEg9mnJxB8vNXbNB.jpg" -O /etc/icons/discord.jpg
@@ -1228,7 +1236,7 @@ if [[ -n "$media_icons" ]]; then
     echo -e "\n====== Installing Media Icons ======\n"
 
     # setup
-    mkdir -p /etc/icons
+    [[ -d /etc/icons ]] || { sudo mkdir -p /etc/icons; sudo chown `id -nu`:`id -ng` /etc/icons; }
     
     # Amazon 
     sudo wget "https://vectorified.com/images/amazon-prime-video-icon-10.jpg" -O /etc/icons/amazon.jpg
