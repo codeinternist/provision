@@ -225,12 +225,12 @@ desktop_link() {
     if [[ "$1" == "--ff" ]]; then
         name="$2"
         type="$3"
-        exec="firefox ... $4"
+        exec="firefox $4"
         icon="$5"
     else
         name="$1"
         type="$2"
-        exec="google-chrome-stable ... $3"
+        exec="google-chrome --new-window $3"
         icon="$4"
     fi
 
