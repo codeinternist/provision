@@ -10,7 +10,6 @@ if [[ -n "$1" ]]; then
         case $1 in
             -a | --all )            basic=true
                                     dev=true
-                                    game=true
                                     game_icons=true
                                     media_icons=true
                                     settings=true ;;
@@ -209,7 +208,7 @@ desktop_icon() {
     # desktop_icon NAME TYPE PATH ICON
     file=$HOME/Desktop/$1.desktop
     touch $file
-    echo -e " \
+    echo -e "\
 [Desktop Entry]\n\
 Encoding=UTF-8\n\
 Name=$1\n\
@@ -237,7 +236,7 @@ desktop_link() {
 
     file=$HOME/Desktop/$name.desktop
     touch $file
-    echo -e " \
+    echo -e "\
 [Desktop Entry]\n\
 Encoding=UTF-8\n\
 Name=$name\n\
@@ -253,7 +252,7 @@ menu_icon() {
     # menu_icon NAME TYPE PATH ICON
     file=$HOME/.local/share/applications/$1.desktop
     touch $file
-    echo -e " \
+    echo -e "\
 [Desktop Entry]\n\
 Encoding=UTF-8\n\
 Name=$1\n\
@@ -336,14 +335,13 @@ if [[ -n "$dev" ]]; then
     draw_progress_bar 12
 
     # configure gnome terminal
-    uuid=`gsettings get org.gnome.Terminal.ProfilesList default | grep "s|'||g"`
+    uuid=`gsettings get org.gnome.Terminal.ProfilesList default | sed "s|'||g"`
     prof="org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$uuid/"
-    alias gset="gsettings set $prof"
-    gset foreground-color 'rgb(255,255,255)'
-    gset background-color 'rgb(0,0,0)'
-    gset use-theme-colors false
-    gset font "Fira Code Retina 10"
-    gset use-system-font false
+    gsettings set $prof foreground-color 'rgb(255,255,255)'
+    gsettings set $prof background-color 'rgb(0,0,0)'
+    gsettings set $prof use-theme-colors false
+    gsettings set $prof font "Fira Code Retina 10"
+    gsettings set $prof use-system-font false
 
     # add agnoster prompt
     echo ">>>  writing .bashrc"
@@ -889,7 +887,7 @@ alias tfs=\"terraform show\"\n\
     sudo ln -s /etc/arduino/arduino-1.8.13/arduino /usr/local/bin/arduino
     draw_progress_bar 22
     
-    # install aws-cli
+    # install aws-cli   FIXME
     echo -e "\n>>> installing aws-cli <<<\n"
     wget "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O /tmp/awscliv2.zip
     sudo mkdir -p /etc/awscli
@@ -998,7 +996,7 @@ export NODE_OPTIONS=\"--experimental-repl-await\"\n\
 " >> $HOME/.bash_exports
     draw_progress_bar 46
 
-    # install postman
+    # install postman   TODO    configure (no sign in; dark mode)
     echo -e "\n>>> installing postman <<<\n"
     wget "https://dl.pstmn.io/download/latest/linux64" -O /tmp/postman.tar.gz
     mydir /opt/postman
@@ -1023,7 +1021,7 @@ export NODE_OPTIONS=\"--experimental-repl-await\"\n\
     sudo gdebi -n /tmp/rpi-imager.deb
     draw_progress_bar 52
 
-    # install slack     TODO unpin version
+    # install slack     TODO unpin version; configure (dark mode)
     echo -e "\n>>> installing slack <<<\n"
     wget "https://downloads.slack-edge.com/linux_releases/slack-desktop-4.15.0-amd64.deb" -O /tmp/slack.deb
     sudo gdebi -n /tmp/slack.deb
@@ -1059,7 +1057,7 @@ draw_progress_bar 60
 if [[ -n "$basic" ]]; then
     echo -e "\n====== Installing General Apps ======\n"
 
-    # install draw.io    TODO    unpin version
+    # install draw.io    TODO    unpin version; configure (dark mode)
     echo -e "\n>>> installing draw.io <<<\n"
     wget "https://github.com/jgraph/drawio-desktop/releases/download/v14.5.1/drawio-amd64-14.5.1.deb" -O /tmp/drawio.deb
     sudo gdebi -n /tmp/drawio.deb
@@ -1091,7 +1089,8 @@ if [[ -n "$basic" ]]; then
     echo -e "\n>>> installing multi-container extension <<<\n"
     wget "https://addons.mozilla.org/firefox/downloads/file/3713375/firefox_multi_account_containers-7.3.0-fx.xpi" -O /tmp/firefox_multi_account_containers-7.3.0-fx-xpi
     firefox /tmp/firefox_multi_account_containers-7.3.0-fx.xpi
-    #   configure firefox
+
+    #   configure firefox   FIXME
     echo ">>>  configuring firefox preferences"
     ff_dir="$HOME/.mozilla/firefox"
     user_dir=`ls $ff_dir | grep default$`
@@ -1136,13 +1135,13 @@ if [[ -n "$basic" ]]; then
         sudo chmod +r /opt/google/chrome/extensions/$1.json
         sudo echo -e '{"external_update_url":"https://clients2.google.com/service/update2/crx"}' > $1.json
     }
-    #   install darkreader extension
+    #   install darkreader extension    FIXME
     echo -e "\n>>> installing darkreader extension <<<\n"
     chrext eimadpbcbfnmbkopoojfekhnkhdbieeh
-    #   install 1password extension
+    #   install 1password extension     FIXME
     echo -e "\n>>> installing 1password extension <<<\n"
     chrext aeblfdkhhhdcdjpifhhbdiojplfjncoa
-    #   install ublock origin extension
+    #   install ublock origin extension FIXME
     echo -e "\n>>> installing ublock origin extension <<<\n"
     chrext cjpalhdlnbpafiamejdnhcphjbkeiagm
     draw_progress_bar 68
@@ -1238,7 +1237,7 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     unrar x /tmp/scph39001.rar /etc/ps_bios/ps2
     draw_progress_bar 90
 
-    # install redream
+    # install redream   FIXME   installs broken
     echo -e "\n>>> installing redream <<<\n"
     wget "https://redream.io/download/redream.x86_64-linux-v1.5.0.tar.gz" -O /tmp/redream.tar.gz
     sudo mkdir -p /opt/redream
@@ -1280,45 +1279,45 @@ if [[ -n "$game_icons" ]]; then
     # setup
     [[ -d /etc/icons ]] || { sudo mkdir -p /etc/icons; sudo chown `id -nu`:`id -ng` /etc/icons; }
 
-    # discord
+    # discord   FIXME   blackground
     sudo wget "https://cdn.imgbin.com/0/17/7/imgbin-discord-computer-servers-teamspeak-discord-icon-4pH3jH6t4ZEg9mnJxB8vNXbNB.jpg" -O /etc/icons/discord.jpg
-    desktop_icon discord Game `which discord` /etc/icons/discord.jpg
+    desktop_icon Discord Game `which discord` /etc/icons/discord.jpg
     
     # dolphin
     sudo wget "https://www.logolynx.com/images/logolynx/da/da85020e7769ecd41a5e3e7d313d3e0b.png" -O /etc/icons/dolphin.png
-    desktop_icon dolphin-emu Game `which dolphin-emu` /etc/icons/dolphin.png
+    desktop_icon GameCube Game `which dolphin-emu` /etc/icons/dolphin.png
 
-    # fusion
+    # fusion    FIXME   squarer icon
     sudo wget "https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Sega_genesis_logo.svg/1280px-Sega_genesis_logo.svg.png" -O /etc/icons/fusion.png
-    desktop_icon kega-fusion Game `which kega-fusion` /etc/icons/fusion.png
+    desktop_icon Genesis Game `which kega-fusion` /etc/icons/fusion.png
 
-    # mupen
+    # mupen     FIXME   blackground
     sudo wget "https://clipartart.com/images/n64-icon-clipart-3.jpg" -O /etc/icons/mupen.jpg
-    desktop_icon mupen64plus-qt Game `which mupen64plus-qt` /etc/icons/mupen.jpg
+    desktop_icon N64 Game `which mupen64plus-qt` /etc/icons/mupen.jpg
 
     # nestopia
     sudo wget "https://cdn2.iconfinder.com/data/icons/devices-79/512/Controller-512.png" -O /etc/icons/nestopia.png
-    desktop_icon nestopia Game `which nestopia` /etc/icons/nestopia.png
+    desktop_icon NES Game `which nestopia` /etc/icons/nestopia.png
     
-    # pcsx
+    # pcsx      FIXME   broken icon
     sudo wget "https://image.flaticon.com/icons/png/512/588/588299.png" -O /etc/icons/pcsx.png
-    desktop_icon pcsx Game `which pcsx` /etc/icons/pcsx.png
+    desktop_icon PSX Game `which pcsx` /etc/icons/pcsx.png
 
-    # pcsx2
+    # pcsx2     FIXME   broken icon
     sudo wget "https://image.flaticon.com/icons/png/512/588/588284.png" -O /etc/icons/pcsx2.png
-    desktop_icon pcsx2 Game `which pcsx2` /etc/icons/pcsx2.png
+    desktop_icon PS2 Game `which pcsx2` /etc/icons/pcsx2.png
     
-    # redream
+    # redream   FIXME   blackground
     [[ -f /etc/icons/redream.jpg ]] || sudo wget "https://clipground.com/images/dreamcast-logo-png-3.jpg" -O /etc/icons/redream.jpg
     desktop_icon Dreamcast Game /opt/redream/redream /etc/icons/redream.jpg
 
-    # snes9x
+    # snes9x    FIXME   broken icon
     sudo wget "https://findicons.com/files/icons/1063/3d_cartoon_icons_iii/300/nintendo_snes.png" -O /etc/icons/snes9x.png
-    desktop_icon snes9x Game `which snes9x` /etc/icons/snes9x.png
+    desktop_icon SNES Game `which snes9x` /etc/icons/snes9x.png
 
     # steam
     sudo wget "https://cdn2.iconfinder.com/data/icons/zeshio-s-social-media/200/Social_Media_Icons_Edged_Highlight_16-16-512.png" -O /etc/icons/steam.png
-    desktop_icon steam Game `which steam` /etc/icons/steam.png
+    desktop_icon Steam Game `which steam` /etc/icons/steam.png
 fi
 draw_progress_bar 98
 
@@ -1333,11 +1332,11 @@ if [[ -n "$media_icons" ]]; then
     # setup
     [[ -d /etc/icons ]] || { sudo mkdir -p /etc/icons; sudo chown `id -nu`:`id -ng` /etc/icons; }
     
-    # Amazon 
+    # Amazon        FIXME   blackground
     sudo wget "https://vectorified.com/images/amazon-prime-video-icon-10.jpg" -O /etc/icons/amazon.jpg
     desktop_link Amazon AudioVideo "https://www.amazon.com/Amazon-Video" /etc/icons/amazon.jpg
 
-    # Discovery+
+    # Discovery+    FIXME   blackground
     sudo wget "https://banner2.kisspng.com/20180404/poe/kisspng-discovery-channel-logo-television-channel-discover-investigation-5ac4e8fb2f2be3.8742228415228541391932.jpg" -O /etc/icons/discovery.jpg
     desktop_link Discovery+ AudioVideo "https://www.discoveryplus.com" /etc/icons/discovery.jpg
 
@@ -1345,11 +1344,11 @@ if [[ -n "$media_icons" ]]; then
     sudo wget "http://logok.org/wp-content/uploads/2015/02/ESPN-logo-wordmark.png" -O /etc/icons/espn.png
     desktop_link ESPN AudioVideo "https://www.espn.com/watch/" /etc/icons/espn.png
 
-    # HBO Max
+    # HBO Max       FIXME   broken icon
     sudo wget "http://logok.org/wp-content/uploads/2014/10/HBO_logo.png" -O /etc/icons/hbo.png
     desktop_link HBO Max AudioVideo "https://play.hbomax.com/n" /etc/icons/hbo.png
 
-    # Netflix
+    # Netflix       FIXME   blackground
     sudo wget "https://dwglogo.com/wp-content/uploads/2019/02/Netflix_N_logo.png" -O /etc/icons/netflix.png
     desktop_link Netflix AudioVideo "https://www.netflix.com/browse" /etc/icons/netflix.png
 
@@ -1357,7 +1356,7 @@ if [[ -n "$media_icons" ]]; then
     sudo wget "http://logok.org/wp-content/uploads/2014/03/NBC-peacock-logo.png" -O /etc/icons/peacock.png
     desktop_link Peacock AudioVideo "https://www.peacocktv.com/watch/home" /etc/icons/peacock.png
 
-    # SportSurge
+    # SportSurge    FIXME   blackground
     sudo wget "http://img4.wikia.nocookie.net/__cb20120228000222/logopedia/images/6/64/Surge_logo1.jpg" -O /etc/icons/surge.jpg
     desktop_link --ff SportSurge AudioVideo "https://sportsurge.net" /etc/icons/surge.jpg
 
@@ -1365,7 +1364,7 @@ if [[ -n "$media_icons" ]]; then
     sudo wget "http://www.soft32.com/blog/wp-content/uploads/2016/08/spotify_logo.png" -O /etc/icons/spotify.png
     desktop_link Spotify AudioVideo "https://open.spotify.com/" /etc/icons/spotify.png
 
-    # VLC
+    # VLC           FIXME   blackground
     sudo wget "https://clipground.com/images/vlc-media-player-clipart-1.jpg" -O /etc/icons/vlc.jpg
     desktop_icon VLC AudioVideo `which vlc` /etc/icons/vlc.jpg
 
