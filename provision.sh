@@ -8,6 +8,12 @@ RELEASE_VERSION=20.04
 if [[ -n "$1" ]]; then
     while [[ -n "$1" ]]; do
         case $1 in
+            -a | --all )            basic=true
+                                    dev=true
+                                    game=true
+                                    game_icons=true
+                                    media_icons=true
+                                    settings=true ;;
             -b | --basic )          basic=true ;;
             -d | --dev )            dev=true ;;
             -g | --game )           game=true ;;
@@ -272,6 +278,9 @@ mydir() {
 
 setup_scroll_area
 
+### add repositories and keys ###
+sudo add-apt-repository -y ppa:graphics-drivers/ppa
+
 ### update apt ###
 echo ">>>  updating apt"
 sudo apt-get update
@@ -320,11 +329,21 @@ if [[ -n "$dev" ]]; then
     mkdir -p $HOME/source
 
     # install firacode font
-    echo ">>>  installing firacode font"
+    echo -e "\n>>> installing firacode font <<<\n"
     sudo apt-add-repository universe
     sudo apt-get update
     sudo apt-get install fonts-firacode
     draw_progress_bar 12
+
+    # configure gnome terminal
+    uuid=`gsettings get org.gnome.Terminal.ProfilesList default | grep "s|'||g"`
+    prof="org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$uuid/"
+    alias gset="gsettings set $prof"
+    gset foreground-color 'rgb(255,255,255)'
+    gset background-color 'rgb(0,0,0)'
+    gset use-theme-colors false
+    gset font "Fira Code Retina 10"
+    gset use-system-font false
 
     # add agnoster prompt
     echo ">>>  writing .bashrc"
@@ -547,8 +566,8 @@ prompt_git() {\n\
     if \$(git rev-parse --is-inside-work-tree >/dev/null 2>&1); then\n\
         ZSH_THEME_GIT_PROMPT_DIRTY='±'\n\
         dirty=\$(git_status_dirty)\n\
-        ref=\$(git symbolic-ref HEAD 2> /dev/null) \\ \n\
-            || ref=\"➦ \$(git describe --exact-match --tags HEAD 2> /dev/null)\" \\ \n\
+        ref=\$(git symbolic-ref HEAD 2> /dev/null) \\\n\
+            || ref=\"➦ \$(git describe --exact-match --tags HEAD 2> /dev/null)\" \\\n\
             || ref=\"➦ \$(git show-ref --head -s --abbrev | head -n1 2> /dev/null)\"\n\
         if [[ -n \$dirty ]]; then\n\
             prompt_segment yellow black\n\
@@ -581,10 +600,10 @@ prompt_hg() {\n\
             st=\"\"\n\
             rev=\$(hg id -n 2>/dev/null | sed 's/[^-0-9]//g')\n\
             branch=\$(hg id -b 2>/dev/null)\n\
-            if `hg st | grep -q \"^\?\"`; then\n\
+            if \`hg st | grep -q \"^\?\"\`; then\n\
                 prompt_segment red white\n\
                 st='±'\n\
-            elif `hg st | grep -q \"^[MA]\"`; then\n\
+            elif \`hg st | grep -q \"^[MA]\"\`; then\n\
                 prompt_segment yellow black\n\
                 st='±'\n\
             else\n\
@@ -810,7 +829,7 @@ alias tfs=\"terraform show\"\n\
     draw_progress_bar 14
 
     # install deps
-    echo ">>>  installing deps"
+    echo -e "\n>>> installing deps <<<\n"
     sudo apt-get install -y \
         apt-transport-https \
         build-essential \
@@ -822,14 +841,21 @@ alias tfs=\"terraform show\"\n\
         wget
     draw_progress_bar 16
 
+    # install jq
+    echo -e "\n>>> installing jq <<<\n"
+    sudo apt-get install -y jq
+    draw_progress_bar 18
+
     # install vs code
-    echo ">>>  installing vs code"
+    echo -e "\n>>> installing vs code <<<\n"
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
     sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
     sudo sh -c 'echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
     rm -f packages.microsoft.gpg
     sudo apt-get update
     sudo apt-get install -y code
+
+    # configure vs code
     code --install-extension bierner.markdown-mermaid
     code --install-extension coenraads.bracket-pair-colorizer-2
     code --install-extension eamodio.gitlens
@@ -837,26 +863,42 @@ alias tfs=\"terraform show\"\n\
     code --install-extension oderwat.indent-rainbow
     code --install-extension redhat.vscode-yaml
     code --install-extension tomoyukim.vscode-mermaid-editor
-    draw_progress_bar 18
+
+    sets=$HOME/.config/Code/User/settings.json
+    jq -n '{"editor.fontFamily":"Fira Code"}' > $sets
+    crst() { jq ". |= . + {\"$1\":false}" $sets; }
+    cset() { jq ". |= . + {\"$1\":true}" $sets; }
+    cstr() { jq ". |= . + {\"$1\":\"$2\"}" $sets; }
+
+    cset editor.fontLigatures
+    cstr latex-workshop.view.pdf.viewer tab
+    cset extensions.ignoreRecommendations
+    cstr arduino.path "/usr/local/bin/arduino"
+    crst telemetry.enableCrashReporter
+    crst telemetry.enableTelemetry
+    crst update.showReleaseNotes
+    draw_progress_bar 20
     
     # install arduino
-    echo ">>>  installing arduino"
+    echo -e "\n>>> installing arduino <<<\n"
     mkdir -p $HOME/source/arduino
     wget https://downloads.arduino.cc/arduino-1.8.13-linux64.tar.xz -O /tmp/arduino.tar.xz
     mydir /etc/arduino
-    tar xzf /tmp/arduino.tar.xz -C /etc/arduino
+    tar xf /tmp/arduino.tar.xz -C /etc/arduino
     /etc/arduino/install.sh
-    draw_progress_bar 20
+    sudo ln -s /etc/arduino/arduino-1.8.13/arduino /usr/local/bin/arduino
+    draw_progress_bar 22
     
     # install aws-cli
-    echo ">>>  installing aws-cli"
+    echo -e "\n>>> installing aws-cli <<<\n"
     wget "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O /tmp/awscliv2.zip
-    unzip /tmp/awscliv2.zip
+    sudo mkdir -p /etc/awscli
+    sudo unzip /tmp/awscliv2.zip -d /etc/awscli
     sudo /tmp/aws/install
-    draw_progress_bar 22
+    draw_progress_bar 24
 
     # install docker
-    echo ">>>  installing docker"
+    echo -e "\n>>> installing docker <<<\n"
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
 $RELEASE_NAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
@@ -865,47 +907,47 @@ $RELEASE_NAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo groupadd docker
     sudo useradd -aG docker $USER
     code --install-extension ms-azuretools.vscode-docker
-    draw_progress_bar 24
+    draw_progress_bar 26
     
-    # install docker-compose     FIXME   unpin version
-    echo ">>>  installing docker-compose"
+    # install docker-compose     TODO    unpin version
+    echo -e "\n>>> installing docker-compose <<<\n"
     sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
     sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
-    draw_progress_bar 26
+    draw_progress_bar 28
 
-    # install dotnet     FIXME 404
-    echo ">>>  installing dotnet"
+    # install dotnet
+    echo -e "\n>>> installing dotnet <<<\n"
     mkdir -p $HOME/source/dotnet
     wget "https://packages.microsoft.com/config/ubuntu/$RELEASE_VERSION/packages-microsoft-prod.deb" -O /tmp/packages-microsoft-prod.deb
     sudo dpkg -i /tmp/packages-microsoft-prod.deb
     sudo apt-get update
     sudo apt-get install -y dotnet-sdk-5.0 nuget
     code --install-extension ms-dotnettools.csharp
-    draw_progress_bar 28
-
-    # install g++
-    echo ">>>  installing g++"
-    sudo apt-get install -y g++
     draw_progress_bar 30
 
+    # install g++
+    echo -e "\n>>> installing g++ <<<\n"
+    sudo apt-get install -y g++
+    draw_progress_bar 32
+
     # install gcloud
-    echo ">>>  installing gcloud"
+    echo -e "\n>>> installing gcloud <<<\n"
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
     sudo apt-get update
     sudo apt-get install -y google-cloud-sdk
-    draw_progress_bar 32
+    draw_progress_bar 34
 
     # install git
-    echo ">>>  installing git"
+    echo -e "\n>>> installing git <<<\n"
     sudo add-apt-repository -y ppa:git-core/ppa
     sudo apt-get update
     sudo apt-get install -y git
-    draw_progress_bar 34
+    draw_progress_bar 36
 
-    # install golang     FIXME unpin version
-    echo ">>>  installing golang"
+    # install golang     TODO    unpin version
+    echo -e "\n>>> installing golang <<<\n"
     mkdir -p $HOME/source/go
     mkdir -p $HOME/go/bin
     mkdir -p $HOME/go/src
@@ -920,34 +962,29 @@ export GOBIN=\$HOME/go/bin\n\
 export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n\
 " >> $HOME/.bash_exports
     code --install-extension golang.go
-    draw_progress_bar 36
+    draw_progress_bar 38
 
     # install helm
-    echo ">>>  installing helm"
+    echo -e "\n>>> installing helm <<<\n"
     curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
     echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
     sudo apt-get update
     sudo apt-get install -y helm
-    draw_progress_bar 38
-
-    # install jq
-    echo ">>>  installing jq"
-    sudo apt-get install -y jq
     draw_progress_bar 40
 
     # install kubectl
-    echo ">>>  installing kubectl"
+    echo -e "\n>>> installing kubectl <<<\n"
     sudo apt-get install -y kubectl
     draw_progress_bar 42
 
     # install latex
-    echo ">>>  installing latex"
+    echo -e "\n>>> installing latex <<<\n"
     sudo apt-get install -y texlive-latex-base texlive-fonts-recommended texlive-fonts-extra texlive-latex-extra
     code --install-extension James-Yu.latex-workshop
     draw_progress_bar 44
 
     # install nodejs
-    echo ">>>  installing nodejs"
+    echo -e "\n>>> installing nodejs <<<\n"
     mkdir -p $HOME/source/nodejs
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
     VERSION=node_14.x
@@ -962,15 +999,15 @@ export NODE_OPTIONS=\"--experimental-repl-await\"\n\
     draw_progress_bar 46
 
     # install postman
-    echo ">>>  installing postman"
-    wget --content-disposition "https://dl.pstmn.io/download/latest/linux64" -O /tmp/postman.tar.gz
+    echo -e "\n>>> installing postman <<<\n"
+    wget "https://dl.pstmn.io/download/latest/linux64" -O /tmp/postman.tar.gz
     mydir /opt/postman
     tar -C /opt/postman -xzf /tmp/postman.tar.gz
     menu_icon Postman Development /opt/postman/Postman/app/Postman /opt/postman/Postman/app/resources/app/assets/icon.png
     draw_progress_bar 48
 
-    # install python     FIXME   unpin version
-    echo ">>>  installing python 3.10"
+    # install python     TODO    unpin version
+    echo -e "\n>>> installing python 3.10 <<<\n"
     mkdir -p $HOME/source/python
     sudo add-apt-repository -y ppa:deadsnakes/ppa
     sudo apt-get update
@@ -981,19 +1018,19 @@ export NODE_OPTIONS=\"--experimental-repl-await\"\n\
     draw_progress_bar 50
     
     # install rpi-imager
-    echo ">>>  installing raspberry pi imager"
+    echo -e "\n>>> installing raspberry pi imager <<<\n"
     wget "https://downloads.raspberrypi.org/imager/imager_latest_amd64.deb" -O /tmp/rpi-imager.deb
     sudo gdebi -n /tmp/rpi-imager.deb
     draw_progress_bar 52
 
-    # install slack     FIXME   unpin version
-    echo ">>>  installing slack"
-    wget "https://downloads.slack-edge.com/slack-desktop-4.15.0-amd64.deb" -O /tmp/slack.deb
+    # install slack     TODO unpin version
+    echo -e "\n>>> installing slack <<<\n"
+    wget "https://downloads.slack-edge.com/linux_releases/slack-desktop-4.15.0-amd64.deb" -O /tmp/slack.deb
     sudo gdebi -n /tmp/slack.deb
     draw_progress_bar 54
 
     # install terraform
-    echo ">>>  installing terraform"
+    echo -e "\n>>> installing terraform <<<\n"
     curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
     sudo apt-add-repository -y "deb [arch=amd64] https://apt.releases.hashicorp.com $RELEASE_NAME main"
     sudo apt-get update
@@ -1001,12 +1038,14 @@ export NODE_OPTIONS=\"--experimental-repl-await\"\n\
     draw_progress_bar 56
 
     # install tldr
-    echo ">>>  installing tldr"
+    echo -e "\n>>> installing tldr <<<\n"
     sudo apt-get install -y tldr
     draw_progress_bar 58
 
-    # install yq     FIXME   unpin version
-    echo ">>>  installing yq"
+    # TODO  install typescript
+
+    # install yq     TODO    unpin version
+    echo -e "\n>>> installing yq <<<\n"
     sudo wget https://github.com/mikefarah/yq/releases/download/v4.2.0/yq_linux_amd64 -O /usr/bin/yq
     sudo chmod +x /usr/bin/yq
 fi
@@ -1020,117 +1059,118 @@ draw_progress_bar 60
 if [[ -n "$basic" ]]; then
     echo -e "\n====== Installing General Apps ======\n"
 
-    # install draw.io    FIXME   unpin version
-    echo ">>>  installing draw.io"
+    # install draw.io    TODO    unpin version
+    echo -e "\n>>> installing draw.io <<<\n"
     wget "https://github.com/jgraph/drawio-desktop/releases/download/v14.5.1/drawio-amd64-14.5.1.deb" -O /tmp/drawio.deb
     sudo gdebi -n /tmp/drawio.deb
     draw_progress_bar 62
 
     # install filezilla
-    echo ">>>  installing filezilla"
+    echo -e "\n>>> installing filezilla <<<\n"
     sudo apt-get install -y filezilla
     draw_progress_bar 64
 
     # install firefox
-    echo ">>>  installing firefox"
+    echo -e "\n>>> installing firefox <<<\n"
     sudo apt-get install -y firefox
     draw_progress_bar 65
 
-    #   install ublock origin extension    FIXME   unpin version
-    echo ">>>  installing ublock origin extension"
+    #   install ublock origin extension    TODO    unpin version
+    echo -e "\n>>> installing ublock origin extension <<<\n"
     wget "https://addons.mozilla.org/firefox/downloads/file/3763753/ublock_origin-1.35.0-an+fx.xpi" -O /tmp/ublock_origin-1.35.0-an+fx.xpi
     firefox /tmp/ublock_origin-1.35.0-an+fx.xpi
-    #   install 1password extension    FIXME   unpin version
-    echo ">>>  installing 1password extension"
+    #   install 1password extension    TODO    unpin version
+    echo -e "\n>>> installing 1password extension <<<\n"
     wget "https://addons.mozilla.org/firefox/downloads/file/3761012/1password_password_manager-1.24.1-fx.xpi" -O /tmp/1password_password_manager-1.24.1-fx.xpi
     firefox /tmp/1password_password_manager-1.24.1-fx.xpi
-    #   install darkreader extension    FIXME   unpin version
-    echo ">>>  installing darkreader extension"
+    #   install darkreader extension    TODO    unpin version
+    echo -e "\n>>> installing darkreader extension <<<\n"
     wget "https://addons.mozilla.org/firefox/downloads/file/3763728/dark_reader-4.9.32-an+fx.xpi" -O /tmp/dark_reader-4.9.32-an+fx.xpi
     firefox /tmp/dark_reader-4.9.32-an+fx.xpi
-    #   install multi-container extension    FIXME   unpin version
-    echo ">>>  installing multi-container extension"
+    #   install multi-container extension    TODO    unpin version
+    echo -e "\n>>> installing multi-container extension <<<\n"
     wget "https://addons.mozilla.org/firefox/downloads/file/3713375/firefox_multi_account_containers-7.3.0-fx.xpi" -O /tmp/firefox_multi_account_containers-7.3.0-fx-xpi
     firefox /tmp/firefox_multi_account_containers-7.3.0-fx.xpi
     #   configure firefox
     echo ">>>  configuring firefox preferences"
-    ff_prefs="/etc/firefox/prefs/all-users.js"
-    sudo mkdir -p /etc/firefox/prefs
-    sudo touch $ff_prefs
-    sudo chown `id -nu`:`id -ng` $ff_prefs
-    echo "pref('app.normandy.enabled', false);" >> $ff_prefs
-    echo "pref('browser.search.region', 'US');" >> $ff_prefs
-    echo "pref('browser.startup.homepage', 'about:blank');" >> $ff_prefs
-    echo "pref('browser.urlbar.placeholderName', 'DuckDuckGo');" >> $ff_prefs
-    echo "pref('browser.urlbar.placeholderName.private', 'DuckDuckGo');" >> $ff_prefs
-    echo "pref('browser.newtabpage.activity-stream.feeds.section.highlights', false);" >> $ff_prefs
-    echo "pref('browser.newtabpage.activity-stream.feeds.section.topstories', false);" >> $ff_prefs
-    echo "pref('browser.newtabpage.activity-stream.showSearch', false);" >> $ff_prefs
-    echo "pref('browser.newtabpage.activity-stream.showSponsored', false);" >> $ff_prefs
-    echo "pref('browser.newtabpage.activity-stream.showSponsoredTopSites', false);" >> $ff_prefs
-    echo "pref('browser.newtabpage.activity-stream.topSitesRows', 4);" >> $ff_prefs
-    echo "pref('browser.urlbar.trimURLs', false);" >> $ff_prefs
-    echo "pref('extensions.activeThemeID', 'firefox-compact-dark@mozilla.org');" >> $ff_prefs
-    echo "pref('general.smoothScroll', false);" >> $ff_prefs
-    echo "pref('general.smoothScroll.mouseWheel.migrationPercent', 0);" >> $ff_prefs
-    echo "pref('media.autoplay.default', 5);" >> $ff_prefs
-    echo "pref('network.dns.disablePrefetch', true);" >> $ff_prefs
-    echo "pref('network.http.speculative-parallel-limit', 0);" >> $ff_prefs
-    echo "pref('network.predictor.cleaned-up', true);" >> $ff_prefs
-    echo "pref('network.predictor.enabled', false);" >> $ff_prefs
-    echo "pref('network.prefetch-next', false);" >> $ff_prefs
-    echo "pref('permissions.default.camera', 2);" >> $ff_prefs
-    echo "pref('permissions.default.desktop-notification', 2);" >> $ff_prefs
-    echo "pref('permissions.default.geo', 2);" >> $ff_prefs
-    echo "pref('privacy.popups.policy', 1);" >> $ff_prefs
+    ff_dir="$HOME/.mozilla/firefox"
+    user_dir=`ls $ff_dir | grep default$`
+    ff_prefs="$ff_dir/$user_dir/prefs.js"
+    touch $ff_prefs
+    echo "user_pref('app.normandy.enabled', false);" >> $ff_prefs
+    echo "user_pref('browser.search.region', 'US');" >> $ff_prefs
+    echo "user_pref('browser.startup.homepage', 'about:blank');" >> $ff_prefs
+    echo "user_pref('browser.urlbar.placeholderName', 'DuckDuckGo');" >> $ff_prefs
+    echo "user_pref('browser.urlbar.placeholderName.private', 'DuckDuckGo');" >> $ff_prefs
+    echo "user_pref('browser.newtabpage.activity-stream.feeds.section.highlights', false);" >> $ff_prefs
+    echo "user_pref('browser.newtabpage.activity-stream.feeds.section.topstories', false);" >> $ff_prefs
+    echo "user_pref('browser.newtabpage.activity-stream.showSearch', false);" >> $ff_prefs
+    echo "user_pref('browser.newtabpage.activity-stream.showSponsored', false);" >> $ff_prefs
+    echo "user_pref('browser.newtabpage.activity-stream.showSponsoredTopSites', false);" >> $ff_prefs
+    echo "user_pref('browser.newtabpage.activity-stream.topSitesRows', 4);" >> $ff_prefs
+    echo "user_pref('browser.urlbar.trimURLs', false);" >> $ff_prefs
+    echo "user_pref('extensions.activeThemeID', 'firefox-compact-dark@mozilla.org');" >> $ff_prefs
+    echo "user_pref('general.smoothScroll', false);" >> $ff_prefs
+    echo "user_pref('general.smoothScroll.mouseWheel.migrationPercent', 0);" >> $ff_prefs
+    echo "user_pref('media.autoplay.default', 5);" >> $ff_prefs
+    echo "user_pref('network.dns.disablePrefetch', true);" >> $ff_prefs
+    echo "user_pref('network.http.speculative-parallel-limit', 0);" >> $ff_prefs
+    echo "user_pref('network.predictor.cleaned-up', true);" >> $ff_prefs
+    echo "user_pref('network.predictor.enabled', false);" >> $ff_prefs
+    echo "user_pref('network.prefetch-next', false);" >> $ff_prefs
+    echo "user_pref('permissions.default.camera', 2);" >> $ff_prefs
+    echo "user_pref('permissions.default.desktop-notification', 2);" >> $ff_prefs
+    echo "user_pref('permissions.default.geo', 2);" >> $ff_prefs
+    echo "user_pref('privacy.popups.policy', 1);" >> $ff_prefs
     draw_progress_bar 66
 
-    # install google chrome  FIXME cannot find package
-    echo ">>>  installing google chrome"
-    sudo apt-get install -y google-chrome-stable
+    # install google chrome
+    echo -e "\n>>> installing google chrome <<<\n"
+    wget "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb" -O /tmp/chrome.deb
+    sudo gdebi -n /tmp/chrome.deb
     draw_progress_bar 67
 
-    google-chrome-stable --load-extension
+    mydir /opt/google/chrome/extensions
     chrext() { 
         sudo touch /opt/google/chrome/extensions/$1.json
         sudo chmod +r /opt/google/chrome/extensions/$1.json
         sudo echo -e '{"external_update_url":"https://clients2.google.com/service/update2/crx"}' > $1.json
     }
     #   install darkreader extension
-    echo ">>>  installing darkreader extension"
+    echo -e "\n>>> installing darkreader extension <<<\n"
     chrext eimadpbcbfnmbkopoojfekhnkhdbieeh
     #   install 1password extension
-    echo ">>>  installing 1password extension"
+    echo -e "\n>>> installing 1password extension <<<\n"
     chrext aeblfdkhhhdcdjpifhhbdiojplfjncoa
     #   install ublock origin extension
-    echo ">>>  installing ublock origin extension"
+    echo -e "\n>>> installing ublock origin extension <<<\n"
     chrext cjpalhdlnbpafiamejdnhcphjbkeiagm
     draw_progress_bar 68
 
     # install google earth
-    echo ">>>  installing google earth"
+    echo -e "\n>>> installing google earth <<<\n"
     sudo apt-get install -y google-earth-pro-stable
     draw_progress_bar 70
 
     # install keybase
-    echo ">>>  installing keybase"
+    echo -e "\n>>> installing keybase <<<\n"
     wget "https://prerelease.keybase.io/keybase_amd64.deb" -O /tmp/keybase_amd64.deb
     sudo gdebi -n /tmp/keybase_amd64.deb
     draw_progress_bar 72
 
     # install mullvad
-    echo ">>>  installing mullvad vpn client"
-    wget --content-disposition https://mullvad.net/download/app/deb/latest -O /tmp/mullvad.deb
+    echo -e "\n>>> installing mullvad vpn client <<<\n"
+    wget https://mullvad.net/download/app/deb/latest -O /tmp/mullvad.deb
     sudo gdebi -n /tmp/mullvad.deb
     draw_progress_bar 73
 
     # install vlc
-    echo ">>>  installing vlc"
+    echo -e "\n>>> installing vlc <<<\n"
     sudo apt-get install -y vlc
     draw_progress_bar 74
 
     # install xpad
-    echo ">>>  installing xpad"
+    echo -e "\n>>> installing xpad <<<\n"
     sudo apt-get install -y xpad
 fi
 draw_progress_bar 76
@@ -1148,37 +1188,38 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     sudo mkdir -p /etc/icons
     sudo chown `id -nu`:`id -ng` /etc/icons
 
-    # install discord    FIXME .deb was text/html; unpin version
-    echo ">>>  installing discord"
-    wget "https://dl.discordapp.net/discord-0.0.14.deb" -O /tmp/discord.deb
+    # install discord
+    echo -e "\n>>> installing discord <<<\n"
+    wget "https://discord.com/api/download?platform=linux&format=deb" -O /tmp/discord.deb
+    # wget "https://dl.discordapp.net/apps/linux/0.0.14/discord-0.0.14.deb" -O /tmp/discord.deb
     sudo gdebi -n /tmp/discord.deb
     draw_progress_bar 78
 
     # install dolphin
-    echo ">>>  installing dolphin"
+    echo -e "\n>>> installing dolphin <<<\n"
     sudo apt-add-repository -y ppa:dolphin-emu/ppa
     sudo apt update
     sudo apt install -y dolphin-emu
     draw_progress_bar 80
 
-    # install fusion     FIXME   unpin version
-    echo ">>>  installing fusion"
+    # install fusion
+    echo -e "\n>>> installing fusion <<<\n"
     wget "https://www.carpeludum.com/download/kega-fusion_3.63-2_i386.deb" -O /tmp/kega-fusion.deb
     sudo gdebi -n /tmp/kega-fusion.deb
     draw_progress_bar 82
 
     # install mupen64plus
-    echo ">>>  installing mupen"
+    echo -e "\n>>> installing mupen <<<\n"
     sudo apt-get install -y mupen64plus-qt
     draw_progress_bar 84
 
     # install nestopia
-    echo ">>>  installing nestopia"
+    echo -e "\n>>> installing nestopia <<<\n"
     sudo apt-get install -y nestopia
     draw_progress_bar 86
 
     # install pcsx-reloaded
-    echo ">>>  installing pcsx reloaded"
+    echo -e "\n>>> installing pcsx reloaded <<<\n"
     sudo apt-get install -y pcsxr
     wget "https://the-eye.eu/public/rom/Bios/psx/scph1001.zip" -O /tmp/scph1001.zip
     sudo mkdir -p /etc/ps_bios/psx
@@ -1187,7 +1228,7 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     draw_progress_bar 88
 
     # install pcsx2
-    echo ">>>  installing pcsx2"
+    echo -e "\n>>> installing pcsx2 <<<\n"
     sudo add-apt-repository -y ppa:gregory-hainaut/pcsx2.official.ppa
     sudo apt update
     sudo apt install -y pcsx2
@@ -1197,29 +1238,29 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     unrar x /tmp/scph39001.rar /etc/ps_bios/ps2
     draw_progress_bar 90
 
-    # install redream    FIXME tar.gz is actually text/htmll unpin version
-    echo ">>>  installing redream"
-    wget "https://redream.io/redream.x86_64-linux-v1.5.0.tar.gz" -O /tmp/redream.tar.gz
+    # install redream
+    echo -e "\n>>> installing redream <<<\n"
+    wget "https://redream.io/download/redream.x86_64-linux-v1.5.0.tar.gz" -O /tmp/redream.tar.gz
     sudo mkdir -p /opt/redream
     sudo tar -C /opt/redream -xzf /tmp/redream.tar.gz
     [[ -f /etc/icons/redream.jpg ]] || sudo wget "https://clipground.com/images/dreamcast-logo-png-3.jpg" -O /etc/icons/redream.jpg
     menu_icon Redream Game /opt/redream/redream /etc/icons/dreamcast.jpg
     draw_progress_bar 92
 
-    # install snes9x     FIXME   unpin version
-    echo ">>>  installing snes9x"
+    # install snes9x
+    echo -e "\n>>> installing snes9x <<<\n"
     wget "https://sites.google.com/site/bearoso/snes9x/snes9x_1.60-1_amd64.deb" -O /tmp/snes9x.deb
     sudo gdebi -n /tmp/snes9x.deb
     draw_progress_bar 94
 
-    # install steam      FIXME 404
-    echo ">>>  installing steam"
-    wget --content-disposition "https://repo.steampowered.com/steam_latest.deb" -O /tmp/steam.deb
+    # install steam
+    echo -e "\n>>> installing steam <<<\n"
+    wget "https://repo.steampowered.com/steam/archive/precise/steam_latest.deb" -O /tmp/steam.deb
     sudo gdebi -n /tmp/steam.deb
     draw_progress_bar 95
 
     # install wine
-    echo ">>>  installing wine"
+    echo -e "\n>>> installing wine <<<\n"
     wget -nc https://dl.winehq.org/wine-builds/winehq.key -O /tmp/winehq.key
     sudo apt-key add /tmp/winehq.key
     sudo add-apt-repository -y "deb https://dl.winehq.org/wine-builds/ubuntu/ focal main"
