@@ -1,6 +1,18 @@
 #!/bin/bash
 
 ### settings ###
+# TODO  automate latest versions
+DOCKER_COMPOSE_VERSION=1.29.1
+GOLANG_VERSION=1.16.3
+NODE_VERSION=node_14.x
+PYTHON_VERSION=3.10
+SLACK_VERSION=4.15.0
+YQ_VERSION=v4.2.0
+DRAWIO_VERSION=v14.5.1
+UBLOCK_ORIGIN_VERSION=1.35.0
+ONEPASSWORD_VERSION=1.24.1
+DARKREADER_VERSION=4.9.32
+MULTI_CONTAINER_VERSION=7.3.0
 RELEASE_NAME=focal
 RELEASE_VERSION=20.04
 
@@ -891,12 +903,13 @@ alias tfs=\"terraform show\"\n\
     sudo ln -s /etc/arduino/arduino-1.8.13/arduino /usr/local/bin/arduino
     draw_progress_bar 22
     
-    # install aws-cli   FIXME
+    # install aws-cli   PEND
     echo -e "\n>>> installing aws-cli <<<\n"
     wget "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -O /tmp/awscliv2.zip
     sudo mkdir -p /etc/awscli
     sudo unzip /tmp/awscliv2.zip -d /etc/awscli
     sudo /tmp/aws/install
+    sudo ln -s /etc/awscli/aws/dist/aws /usr/local/bin/aws
     draw_progress_bar 24
 
     # install docker
@@ -911,9 +924,9 @@ $RELEASE_NAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     code --install-extension ms-azuretools.vscode-docker
     draw_progress_bar 26
     
-    # install docker-compose     TODO    unpin version
+    # install docker-compose
     echo -e "\n>>> installing docker-compose <<<\n"
-    sudo curl -L "https://github.com/docker/compose/releases/download/1.29.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo curl -L "https://github.com/docker/compose/releases/download/$DOCKER_COMPOSE_VERSION/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
     sudo chmod +x /usr/local/bin/docker-compose
     sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
     draw_progress_bar 28
@@ -948,13 +961,13 @@ $RELEASE_NAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo apt-get install -y git
     draw_progress_bar 36
 
-    # install golang     TODO    unpin version
+    # install golang
     echo -e "\n>>> installing golang <<<\n"
     mkdir -p $HOME/source/go
     mkdir -p $HOME/go/bin
     mkdir -p $HOME/go/src
-    wget "https://golang.org/dl/go1.16.3.linux-amd64.tar.gz" -O /tmp/go1.16.3.linux-amd64.tar.gz
-    sudo tar -C /usr/local -xzf /tmp/go1.16.3.linux-amd64.tar.gz
+    wget "https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz" -O /tmp/go$GOLANG_VERSION.linux-amd64.tar.gz
+    sudo tar -C /usr/local -xzf /tmp/go$GOLANG_VERSION.linux-amd64.tar.gz
     export GOPATH=$HOME/go
     export GOBIN=$HOME/go/bin
     export PATH=$PATH:/usr/local/go/bin:$GOBIN
@@ -989,9 +1002,8 @@ export PATH=\$PATH:/usr/local/go/bin:\$GOBIN\n\
     echo -e "\n>>> installing nodejs <<<\n"
     mkdir -p $HOME/source/nodejs
     curl -fsSL https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
-    VERSION=node_14.x
-    echo "deb https://deb.nodesource.com/$VERSION $RELEASE_NAME main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-    echo "deb-src https://deb.nodesource.com/$VERSION $RELEASE_NAME main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
+    echo "deb https://deb.nodesource.com/$NODE_VERSION $RELEASE_NAME main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+    echo "deb-src https://deb.nodesource.com/$NODE_VERSION $RELEASE_NAME main" | sudo tee -a /etc/apt/sources.list.d/nodesource.list
     sudo apt-get update
     sudo apt-get install -y nodejs npm
     echo -e "\n\
@@ -1008,13 +1020,13 @@ export NODE_OPTIONS=\"--experimental-repl-await\"\n\
     menu_icon Postman Development /opt/postman/Postman/app/Postman /opt/postman/Postman/app/resources/app/assets/icon.png
     draw_progress_bar 48
 
-    # install python     TODO    unpin version
-    echo -e "\n>>> installing python 3.10 <<<\n"
+    # install python
+    echo -e "\n>>> installing python $PYTHON_VERSION <<<\n"
     mkdir -p $HOME/source/python
     sudo add-apt-repository -y ppa:deadsnakes/ppa
     sudo apt-get update
-    sudo apt-get install -y python3.10
-    python3.10 -m pip
+    sudo apt-get install -y python$PYTHON_VERSION
+    python$PYTHON_VERSION -m pip
     pip install aiohttp black codecov fastapi flake8 pytest pytest-asyncio pytest-cov pytest-timeout requests
     code --install-extension ms-python.python
     draw_progress_bar 50
@@ -1025,9 +1037,9 @@ export NODE_OPTIONS=\"--experimental-repl-await\"\n\
     sudo gdebi -n /tmp/rpi-imager.deb
     draw_progress_bar 52
 
-    # install slack     TODO unpin version; configure (dark mode)
+    # install slack     TODO configure (dark mode)
     echo -e "\n>>> installing slack <<<\n"
-    wget "https://downloads.slack-edge.com/linux_releases/slack-desktop-4.15.0-amd64.deb" -O /tmp/slack.deb
+    wget "https://downloads.slack-edge.com/linux_releases/slack-desktop-$SLACK_VERSION-amd64.deb" -O /tmp/slack.deb
     sudo gdebi -n /tmp/slack.deb
     draw_progress_bar 54
 
@@ -1046,9 +1058,9 @@ export NODE_OPTIONS=\"--experimental-repl-await\"\n\
 
     # TODO  install typescript
 
-    # install yq     TODO    unpin version
+    # install yq
     echo -e "\n>>> installing yq <<<\n"
-    sudo wget https://github.com/mikefarah/yq/releases/download/v4.2.0/yq_linux_amd64 -O /usr/bin/yq
+    sudo wget https://github.com/mikefarah/yq/releases/download/$YQ_VERSION/yq_linux_amd64 -O /usr/bin/yq
     sudo chmod +x /usr/bin/yq
 fi
 draw_progress_bar 60
@@ -1061,9 +1073,9 @@ draw_progress_bar 60
 if [[ -n "$basic" ]]; then
     echo -e "\n====== Installing General Apps ======\n"
 
-    # install draw.io    TODO    unpin version; configure (dark mode)
+    # install draw.io    TODO    configure (dark mode)
     echo -e "\n>>> installing draw.io <<<\n"
-    wget "https://github.com/jgraph/drawio-desktop/releases/download/v14.5.1/drawio-amd64-14.5.1.deb" -O /tmp/drawio.deb
+    wget "https://github.com/jgraph/drawio-desktop/releases/download/$DRAWIO_VERSION/drawio-amd64-14.5.1.deb" -O /tmp/drawio.deb
     sudo gdebi -n /tmp/drawio.deb
     draw_progress_bar 62
 
@@ -1077,22 +1089,22 @@ if [[ -n "$basic" ]]; then
     sudo apt-get install -y firefox
     draw_progress_bar 65
 
-    #   install ublock origin extension    TODO    unpin version
+    #   install ublock origin extension
     echo -e "\n>>> installing ublock origin extension <<<\n"
-    wget "https://addons.mozilla.org/firefox/downloads/file/3763753/ublock_origin-1.35.0-an+fx.xpi" -O /tmp/ublock_origin-1.35.0-an+fx.xpi
-    firefox /tmp/ublock_origin-1.35.0-an+fx.xpi
-    #   install 1password extension    TODO    unpin version
+    wget "https://addons.mozilla.org/firefox/downloads/file/3763753/ublock_origin-$UBLOCK_ORIGIN_VERSION-an+fx.xpi" -O /tmp/ublock_origin-$UBLOCK_ORIGIN_VERSION-an+fx.xpi
+    firefox /tmp/ublock_origin-$UBLOCK_ORIGIN_VERSION-an+fx.xpi
+    #   install 1password extension
     echo -e "\n>>> installing 1password extension <<<\n"
-    wget "https://addons.mozilla.org/firefox/downloads/file/3761012/1password_password_manager-1.24.1-fx.xpi" -O /tmp/1password_password_manager-1.24.1-fx.xpi
-    firefox /tmp/1password_password_manager-1.24.1-fx.xpi
-    #   install darkreader extension    TODO    unpin version
+    wget "https://addons.mozilla.org/firefox/downloads/file/3761012/1password_password_manager-$ONEPASSWORD_VERSION-fx.xpi" -O /tmp/1password_password_manager-$ONEPASSWORD_VERSION-fx.xpi
+    firefox /tmp/1password_password_manager-$ONEPASSWORD_VERSION-fx.xpi
+    #   install darkreader extension
     echo -e "\n>>> installing darkreader extension <<<\n"
-    wget "https://addons.mozilla.org/firefox/downloads/file/3763728/dark_reader-4.9.32-an+fx.xpi" -O /tmp/dark_reader-4.9.32-an+fx.xpi
-    firefox /tmp/dark_reader-4.9.32-an+fx.xpi
-    #   install multi-container extension    TODO    unpin version
+    wget "https://addons.mozilla.org/firefox/downloads/file/3763728/dark_reader-$DARKREADER_VERSION-an+fx.xpi" -O /tmp/dark_reader-$DARKREADER_VERSION-an+fx.xpi
+    firefox /tmp/dark_reader-$DARKREADER_VERSION-an+fx.xpi
+    #   install multi-container extension
     echo -e "\n>>> installing multi-container extension <<<\n"
-    wget "https://addons.mozilla.org/firefox/downloads/file/3713375/firefox_multi_account_containers-7.3.0-fx.xpi" -O /tmp/firefox_multi_account_containers-7.3.0-fx-xpi
-    firefox /tmp/firefox_multi_account_containers-7.3.0-fx.xpi
+    wget "https://addons.mozilla.org/firefox/downloads/file/3713375/firefox_multi_account_containers-$MULTI_CONTAINER_VERSION-fx.xpi" -O /tmp/firefox_multi_account_containers-$MULTI_CONTAINER_VERSION-fx-xpi
+    firefox /tmp/firefox_multi_account_containers-$MULTI_CONTAINER_VERSION-fx.xpi
 
     #   configure firefox   FIXME
     echo ">>>  configuring firefox preferences"
@@ -1246,7 +1258,7 @@ if [[ -n "$game" ]] || [[ -n "$game_icons" ]]; then
     wget "https://redream.io/download/redream.x86_64-linux-v1.5.0.tar.gz" -O /tmp/redream.tar.gz
     sudo mkdir -p /opt/redream
     sudo tar -C /opt/redream -xzf /tmp/redream.tar.gz
-    [[ -f /etc/icons/redream.jpg ]] || sudo wget "https://clipground.com/images/dreamcast-logo-png-3.jpg" -O /etc/icons/redream.jpg
+    [[ -f /etc/icons/Dreamcast.png ]] || desktop_icon Dreamcast Game /opt/redream/redream "https://cdn.pu.nl/article/dc_logo_black.png"
     menu_icon Redream Game /opt/redream/redream /etc/icons/dreamcast.jpg
     draw_progress_bar 92
 
@@ -1283,31 +1295,31 @@ if [[ -n "$game_icons" ]]; then
     # setup
     [[ -d /etc/icons ]] || { sudo mkdir -p /etc/icons; sudo chown `id -nu`:`id -ng` /etc/icons; }
 
-    # discord   PEND   blackground
+    # discord
     desktop_icon Discord Game `which discord` "https://www.podfeet.com/blog/wp-content/uploads/2018/02/discord-logo.png"
     
     # dolphin
     desktop_icon GameCube Game `which dolphin-emu` "https://www.logolynx.com/images/logolynx/da/da85020e7769ecd41a5e3e7d313d3e0b.png"
 
-    # fusion    PEND   squarer icon
+    # fusion
     desktop_icon Genesis Game `which kega-fusion` "https://www.whatsageek.com/wp-content/uploads/2015/03/Sega-Logo-2.jpg"
 
-    # mupen     PEND   blackground
+    # mupen
     desktop_icon N64 Game `which mupen64plus-qt` "https://clipartart.com/images/n64-icon-clipart-4.png"
 
-    # nestopia  PEND
+    # nestopia
     desktop_icon NES Game `which nestopia` "http://i2.wp.com/www.thegameisafootarcade.com/wp-content/uploads/2015/06/NES-logo.jpg?resize=526%2C297"
     
-    # pcsx      PEND   broken icon
+    # pcsx      FIXME   broken icon
     desktop_icon PSX Game `which pcsx` "https://openlab.citytech.cuny.edu/mgoodwin-eportfolio/files/2015/03/PSX-Logo.png"
 
-    # pcsx2     PEND   broken icon
+    # pcsx2     FIXME   broken icon
     desktop_icon PS2 Game `which pcsx2` "https://www.logolynx.com/images/logolynx/ac/acd6d535d370fed0fbbe59ca9490524b.png"
     
-    # redream   PEND   blackground
-    [[ -f /etc/icons/redream.jpg ]] || desktop_icon Dreamcast Game /opt/redream/redream "https://cdn.pu.nl/article/dc_logo_black.png"
+    # redream   PEND   missing icon
+    [[ -f /etc/icons/Dreamcast.png ]] || desktop_icon Dreamcast Game /opt/redream/redream "https://cdn.pu.nl/article/dc_logo_black.png"
 
-    # snes9x    PEND   broken icon
+    # snes9x    FIXME   broken icon
     desktop_icon SNES Game `which snes9x` "https://www.logolynx.com/images/logolynx/38/386765d9b96c11d0758d27cfc3b9bdee.png"
 
     # steam
@@ -1326,37 +1338,37 @@ if [[ -n "$media_icons" ]]; then
     # setup
     [[ -d /etc/icons ]] || { sudo mkdir -p /etc/icons; sudo chown `id -nu`:`id -ng` /etc/icons; }
     
-    # Amazon        PEND   blackground
+    # Amazon
     desktop_link Amazon AudioVideo "https://www.amazon.com/Amazon-Video" "https://marketingland.com/wp-content/ml-loads/2014/08/amazon-blkwht-1920.png"
 
-    # Discovery+    PEND   blackground
+    # Discovery+
     desktop_link Discovery+ AudioVideo "https://www.discoveryplus.com" "https://cf.press.discovery.com/ugc/logos/2009/08/22/DSC_D_pos.png"
 
     # ESPN
     desktop_link ESPN AudioVideo "https://www.espn.com/watch/" "http://logok.org/wp-content/uploads/2015/02/ESPN-logo-wordmark.png"
 
-    # HBO Max       PEND   broken icon
+    # HBO Max       FIXME   broken icon
     desktop_link HBO Max AudioVideo "https://play.hbomax.com/n" "https://hbomax-images.warnermediacdn.com/2020-05/square%20social%20logo%20400%20x%20400_0.png"
 
-    # Netflix       PEND   blackground
+    # Netflix
     desktop_link Netflix AudioVideo "https://www.netflix.com/browse" "https://jobs.netflix.com/static/images/netflix_social_image.png"
 
     # Peacock
     desktop_link Peacock AudioVideo "https://www.peacocktv.com/watch/home" "http://logok.org/wp-content/uploads/2014/03/NBC-peacock-logo.png"
 
-    # SportSurge    PEND   blackground
+    # SportSurge
     desktop_link --ff SportSurge AudioVideo "https://sportsurge.net" "http://img3.wikia.nocookie.net/__cb20120228000316/logopedia/images/7/7e/Surge_logo2.jpg"
 
     # Spotify
     desktop_link Spotify AudioVideo "https://open.spotify.com/" "http://www.soft32.com/blog/wp-content/uploads/2016/08/spotify_logo.png"
 
-    # VLC           PEND   blackground
+    # VLC           FIXME   blackground
     desktop_icon VLC AudioVideo `which vlc` "https://clipground.com/images/vlc-icon-png-8.jpg"
 
-    # VoloKit
+    # VoloKit       FIXME   broken icon
     desktop_link --ff VoloKit AudioVideo "http://www.volokit.com/" "https://pngimg.com/uploads/vkontakte/vkontakte_PNG8.png"
 
-    # YouTube
+    # YouTube       FIXME   broken icon
     desktop_link --ff YouTube AudioVideo "https://www.youtube.com/" "https://dwglogo.com/wp-content/uploads/2020/05/1200px-YouTube_logo.png"
 fi
 draw_progress_bar 100
