@@ -920,7 +920,7 @@ $RELEASE_NAME stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io
     sudo groupadd docker
-    sudo useradd -aG docker $USER
+    sudo usermod -aG docker $USER
     code --install-extension ms-azuretools.vscode-docker
     draw_progress_bar 26
     
